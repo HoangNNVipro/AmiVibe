@@ -12,7 +12,10 @@ const connectDB = async () => {
             console.log("DB Connected");
         });
 
-        await mongoose.connect(`${mongoUri}/e-commerce`);
+        const hasDatabaseInUri = /mongodb(?:\+srv)?:\/\/[^/]+\/.+/.test(mongoUri);
+        const connectionString = hasDatabaseInUri ? mongoUri : `${mongoUri}/e-commerce`;
+
+        await mongoose.connect(connectionString);
     } catch (error) {
         console.error("MongoDB connection failed:", error);
         // Don't exit, allow server to start so we can see UI and logs

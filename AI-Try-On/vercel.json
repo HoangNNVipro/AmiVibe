@@ -23,6 +23,9 @@
       "dest": "Backend/server.ts"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html",
       "status": 200

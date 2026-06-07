@@ -3,6 +3,7 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import cors from "cors";
 import dotenv from "dotenv";
+import serverless from "serverless-http";
 import connectDB from "./config/db.ts";
 import apiRoutes from "./routes/api.ts";
 
@@ -55,5 +56,5 @@ if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
   });
 }
 
-export default app;
+export default serverless(app);
 

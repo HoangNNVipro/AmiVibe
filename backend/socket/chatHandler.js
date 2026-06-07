@@ -1,4 +1,5 @@
 import chatModel from "../models/chatModel.js";
+import userModel from "../models/userModel.js";
 
 // 1. API: Lấy lịch sử chat của một User cụ thể (File cũ của bạn)
 export const getChatHistory = async (req, res) => {
@@ -127,6 +128,9 @@ const chatHandler = (io, socket) => {
         return callback?.({ success: false, message: 'userId is required' });
       }
 
+      const targetUser = await userModel.findById(targetUserId);
+      const userName = targetUser?.name || `Khách hàng (${String(targetUserId).substring(0, 5)})`;
+
       const message = {
         sender: messageSender,
         text: messageText,
@@ -140,7 +144,7 @@ const chatHandler = (io, socket) => {
       const chat = await chatModel.findOneAndUpdate(
         { userId: targetUserId },
         {
-          $set: { status: currentStatus }, // Chuyển đổi trạng thái linh hoạt để báo đèn
+          $set: { status: currentStatus, name: userName }, // Chuyển đổi trạng thái linh hoạt để báo đèn và lưu tên user
           $push: { messages: message }
         },
         { new: true, upsert: true }
@@ -158,6 +162,7 @@ const chatHandler = (io, socket) => {
       // ĐỒNG BỘ REALTIME DANH SÁCH ADMIN: Bắn tín hiệu để màn hình Quản lý Chat của Admin tự động đẩy ca này lên đầu và nhấp nháy đỏ ngay lập tức
       io.emit('adminListUpdate', {
         userId: targetUserId,
+        name: userName,
         status: currentStatus,
         lastMessage: messageText,
         time: message.timestamp

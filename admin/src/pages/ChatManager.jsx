@@ -6,7 +6,6 @@ import { backendUrl } from '../App';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 
-
 // Đặt thành false để kết nối trực tiếp với Database & Socket thật của bạn
 const USE_MOCK = false;
 
@@ -61,7 +60,6 @@ const INITIAL_MOCK_CHATS = [
 ];
 
 // REACT COMPONENT WRAPPER ĐỂ SỬ DỤNG TRỰC TIẾP EMOJI-MART CDN AN TOÀN TRÁNH LỖI COMPILE
-
 const EmojiPickerCDN = ({ onEmojiSelect }) => {
   const containerRef = useRef(null);
 
@@ -114,6 +112,7 @@ const EmojiPickerCDN = ({ onEmojiSelect }) => {
             clearInterval(checkInterval);
           }
         }, 100);
+
         return () => clearInterval(checkInterval);
       }
     };
@@ -137,7 +136,6 @@ const EmojiPickerCDN = ({ onEmojiSelect }) => {
     />
   );
 };
-
 
 const UserAvatar = ({ name }) => {
   const initials = name
@@ -163,23 +161,33 @@ const ChatManager = ({ token }) => {
 
   const socketRef = useRef(null);
   const scrollRef = useRef(null);
+  const chatContainerRef = useRef(null); // Ref dùng cho việc cuộn tin nhắn mượt mà
   const filterDropdownRef = useRef(null);
   const pickerContainerRef = useRef(null);
   const messageInputRef = useRef(null);
-  
+
   // Ref quản lý ID của khách hàng đang chat để tự động kết nối lại khi có sự cố
   const activeChatUserIdRef = useRef(null);
 
   const handleSelectEmoji = (emojiObject) => {
     if (!emojiObject.native) return;
     setInputValue(prev => prev + emojiObject.native);
-    setShowEmojiPicker(false);
+    // Bỏ dòng setShowEmojiPicker(false); để có thể chọn nhiều emoji cùng lúc
     setTimeout(() => messageInputRef.current?.focus(), 0);
   };
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (isNewChat = false) => {
     setTimeout(() => {
-      scrollRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      if (!chatContainerRef.current) return;
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      
+      // Kiểm tra xem có đang ở gần đáy chat không (cách đáy khoảng 150px)
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 150;
+      
+      // Chỉ cuộn nếu đang ở gần đáy HOẶC vừa click mở phòng chat mới
+      if (isNewChat || isNearBottom) {
+        chatContainerRef.current.scrollTo({ top: scrollHeight, behavior: 'smooth' });
+      }
     }, 50);
   };
 
@@ -207,6 +215,7 @@ const ChatManager = ({ token }) => {
       const response = await axios.get(`${backendUrl}/api/chat/all-chats`, {
         headers: { token }
       });
+
       if (response.data.success) {
         setChats(response.data.chats);
       } else {
@@ -257,6 +266,7 @@ const ChatManager = ({ token }) => {
           const updated = [...prevChats];
           updated[index] = {
             ...updated[index],
+            name: data.name || updated[index].name,
             status: data.status,
             lastMessage: data.lastMessage,
             time: data.time
@@ -266,7 +276,7 @@ const ChatManager = ({ token }) => {
           return [
             {
               userId: data.userId,
-              name: `Customer (${String(data.userId).substring(0, 5)})`,
+              name: data.name || `Customer (${String(data.userId).substring(0, 5)})`,
               status: data.status,
               lastMessage: data.lastMessage,
               time: data.time,
@@ -331,16 +341,20 @@ const ChatManager = ({ token }) => {
     };
   }, [token]);
 
+  // Tự động cuộn có điều kiện khi có tin nhắn mới
   useEffect(() => {
-    if (activeChat) {
-      scrollToBottom();
-    }
-  }, [activeChat, activeChat?.messages]);
+    if (activeChat) scrollToBottom(false);
+  }, [activeChat?.messages]);
+
+  // Luôn cuộn xuống đáy khi chuyển phòng chat
+  useEffect(() => {
+    if (activeChat) scrollToBottom(true);
+  }, [activeChat?.userId]);
 
   const handleSelectChat = (chat) => {
     setActiveChat(chat);
     activeChatUserIdRef.current = chat.userId;
-    
+
     if (USE_MOCK) {
       setChats((prev) =>
         prev.map((c) => (c.userId === chat.userId ? { ...c, status: 'in_progress' } : c))
@@ -366,13 +380,16 @@ const ChatManager = ({ token }) => {
     const text = textToSend || inputValue.trim();
     if (!text || !activeChat) return;
 
+    // Thêm lệnh tắt popup emoji 
+    setShowEmojiPicker(false);
+
     if (USE_MOCK) {
       const newMsg = {
         sender: 'admin',
         text,
         timestamp: new Date().toISOString()
       };
-      
+
       setChats((prev) =>
         prev.map((c) => {
           if (c.userId === activeChat.userId) {
@@ -425,6 +442,7 @@ const ChatManager = ({ token }) => {
           return prev;
         });
       }, 2500);
+
       return;
     }
 
@@ -498,16 +516,9 @@ const ChatManager = ({ token }) => {
   }, [chats]);
 
   return (
-    // Đã tối ưu hóa giảm lề trên thêm 50% nữa (pt-0 sm:pt-0.5) giúp đẩy sát bảng chat lên mép trên cùng tuyệt đối
     <div className="bg-slate-50 pt-0 sm:pt-0.5 pb-2 px-2 sm:pb-4 sm:px-4 select-none font-sans text-slate-700 antialiased h-full">
       <div className="max-w-[1600px] mx-auto h-full">
         
-        {/* ========================================================================= */}
-        {/* CHỈNH SỬA CHIỀU CAO THỦ CÔNG TẠI ĐÂY (MANUAL HEIGHT CONFIGURATION):        */}
-        {/* Chiều cao của bảng chat và danh sách khách hàng được cố định tại 'h-[610px]' */}
-        {/* Bạn có thể tự do thay đổi giá trị này thành bất kỳ độ cao nào bạn muốn,   */}
-        {/* ví dụ: h-[700px] hoặc h-[calc(100vh-20px)] để co giãn hoàn toàn.          */}
-        {/* ========================================================================= */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[610px] min-h-[500px] items-stretch">
           
           {/* CỘT CHAT CHÍNH BÊN TRÁI (3/4) */}
@@ -545,8 +556,8 @@ const ChatManager = ({ token }) => {
                   </button>
                 </div>
                 
-                {/* Khung tin nhắn cuộn độc lập */}
-                <div className="flex-1 overflow-y-auto px-6 py-5 bg-[#F4F7F9] space-y-4 scrollbar-thin">
+                {/* Khung tin nhắn cuộn độc lập - Đã cập nhật ref để xử lý scroll mượt */}
+                <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-6 py-5 bg-[#F4F7F9] space-y-4 scrollbar-thin">
                   {activeChat.messages && activeChat.messages.map((msg, index) => {
                     const isAdmin = msg.sender === 'admin';
                     return (
@@ -698,6 +709,7 @@ const ChatManager = ({ token }) => {
                     <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </span>
+                
                 <input 
                   type="text" 
                   value={searchQuery}

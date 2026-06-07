@@ -213,13 +213,17 @@ const App: React.FC = () => {
     skinTone: 'all'
   });
   const [productFilters, setProductFilters] = useState<{
-    gender: 'men' | 'women' | 'all';
-    category: 'Topwear' | 'Bottomwear' | 'all';
-    trending: 'all' | 'trending';
+    gender: 'men' | 'women' | 'unisex' | 'all';
+    category: 'Topwear' | 'Bottomwear' | 'Dress' | 'all';
+    seasons: 'all' | 'Spring' | 'Summer' | 'Autumn' | 'Winter';
+    styles: 'all' | 'Casual' | 'Office' | 'Sporty' | 'Streetwear' | 'Elegant';
+    maxPrice: number;
   }>({
     gender: 'all',
     category: 'all',
-    trending: 'all'
+    seasons: 'all',
+    styles: 'all',
+    maxPrice: 5000
   });
 
   const [selectedModelData, setSelectedModelData] = useState<{ url: string; name: string; desc: string } | null>(null);
@@ -257,9 +261,12 @@ const App: React.FC = () => {
     name: p.name,
     desc: p.description,
     url: p.image && Array.isArray(p.image) && p.image.length > 0 ? p.image[0] : '',
-    gender: p.category?.toLowerCase() === 'men' ? 'men' : 'women',
-    category: p.subCategory, // e.g. Topwear, Bottomwear
-    bestseller: p.bestseller || false
+    gender: p.category?.toLowerCase() === 'men' ? 'men' : (p.category?.toLowerCase() === 'women' ? 'women' : 'unisex'),
+    category: p.subCategory, // e.g. Topwear, Bottomwear, Dress
+    bestseller: p.bestseller || false,
+    price: p.price || 0,
+    seasons: p.seasons || [],
+    styles: p.styles || []
   }));
 
   const handleModelSelect = (model: typeof modelLibrary[0]) => {

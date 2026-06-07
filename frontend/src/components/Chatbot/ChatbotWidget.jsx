@@ -256,7 +256,7 @@ const ChatbotWidget = () => {
                     Support Center
                     <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-ping"></span>
                   </div>
-                  <div className='text-xs text-blue-100 font-medium'>We're online • Tư vấn 24/7</div>
+                  <div className='text-xs text-blue-100 font-medium'>We're online • 24/7</div>
                 </div>
               </div>
               <button

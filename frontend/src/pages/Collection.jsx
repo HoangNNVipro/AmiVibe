@@ -15,8 +15,8 @@ const Collection = () => {
   const [seasons, setSeasons] = useState([]);
   const [styles, setStyles] = useState([]);
   
-  // State cho thanh trượt giá (Mặc định để mức cao nhất, ví dụ 500$)
-  const [maxPrice, setMaxPrice] = useState(500);
+  // State cho thanh trượt giá (Mặc định để mức cao nhất, ví dụ5000$)
+  const [maxPrice, setMaxPrice] = useState(5000);
 
   // --- STATE CUSTOM SORT DROPDOWN ---
   const [sortType, setSortType] = useState('relavent');
@@ -205,8 +205,8 @@ const Collection = () => {
             <input 
               type="range" 
               min="0" 
-              max="500" // Bạn có thể thay đổi số 500 thành mức giá cao nhất trong shop của bạn
-              step="10" 
+              max="5000" // Bạn có thể thay đổi số 5000 thành mức giá cao nhất trong shop của bạn
+              step="50" 
               value={maxPrice} 
               onChange={(e) => setMaxPrice(Number(e.target.value))} 
               className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
@@ -214,7 +214,7 @@ const Collection = () => {
             
             <div className='flex justify-between text-[11px] font-medium text-gray-400 mt-2.5'>
               <span>$0</span>
-              <span>$500</span>
+              <span>$5000</span>
             </div>
           </div>
           

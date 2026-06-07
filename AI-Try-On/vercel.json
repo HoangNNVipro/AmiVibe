@@ -27,13 +27,5 @@
       "dest": "/index.html",
       "status": 200
     }
-  ],
-  "env": {
-    "GEMINI_API_KEY": "@gemini_api_key",
-    "MONGODB_URI": "@mongodb_uri",
-    "CLOUDINARY_NAME": "@cloudinary_name",
-    "CLOUDINARY_API_KEY": "@cloudinary_api_key",
-    "CLOUDINARY_SECRET_KEY": "@cloudinary_secret_key",
-    "JWT_SECRET": "@jwt_secret"
-  }
+  ]
 }

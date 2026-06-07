@@ -29,7 +29,6 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "@vite_api_url",
     "GEMINI_API_KEY": "@gemini_api_key",
     "MONGODB_URI": "@mongodb_uri",
     "CLOUDINARY_NAME": "@cloudinary_name",

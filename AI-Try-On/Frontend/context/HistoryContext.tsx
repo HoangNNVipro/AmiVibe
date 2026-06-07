@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { api } from '../lib/apiClient';
 
 interface HistoryItem {
     _id?: string;
@@ -33,13 +34,10 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const fetchHistory = async () => {
         setLoading(true);
         try {
-            const [vmRes, tryOnRes] = await Promise.all([
-                fetch('/api/virtual-models'),
-                fetch('/api/try-ons')
+            const [vms, tryOns] = await Promise.all([
+                api.get('/api/virtual-models'),
+                api.get('/api/try-ons')
             ]);
-            
-            const vms = await vmRes.json();
-            const tryOns = await tryOnRes.json();
 
             const combined = [
                 ...vms.map((i: any) => ({ ...i, type: 'virtual-model' })),
@@ -65,16 +63,7 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const addVirtualModel = async (item: any) => {
         try {
-            const response = await fetch('/api/virtual-models', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(item)
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `Server responded with ${response.status}`);
-            }
-            const data = await response.json();
+            const data = await api.post('/api/virtual-models', item);
             console.log("Virtual Model saved successfully:", data);
             // Transform to match HistoryItem if needed for UI session display
             setHistory(prev => [{
@@ -89,16 +78,7 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const updateVirtualModel = async (id: string, item: any) => {
         try {
-            const response = await fetch(`/api/virtual-models/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(item)
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `Server responded with ${response.status}`);
-            }
-            const data = await response.json();
+            const data = await api.put(`/api/virtual-models/${id}`, item);
             console.log("Virtual Model updated successfully:", data);
             setHistory(prev => prev.map(h => h._id === id ? { ...data, type: 'virtual-model' } : h));
         } catch (error) {
@@ -108,11 +88,8 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const deleteVirtualModel = async (id: string, type: string) => {
         try {
-            const endpoint = type === 'virtual-model' ? '/api/virtual-models' : '/api/try-ons';
-            const response = await fetch(`${endpoint}/${id}`, {
-                method: 'DELETE'
-            });
-            if (!response.ok) throw new Error("Failed to delete");
+            const endpoint = type === 'virtual-model' ? `/api/virtual-models/${id}` : `/api/try-ons/${id}`;
+            await api.delete(endpoint);
             setHistory(prev => prev.filter(h => h._id !== id));
         } catch (error) {
             console.error("Failed to delete record:", error);
@@ -123,15 +100,8 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         try {
             const endpoint = type === 'virtual-model' ? `/api/virtual-models/${id}/remove-image` : `/api/try-ons/${id}/remove-image`;
             
-            const response = await fetch(endpoint, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ imageUrl })
-            });
+            const updatedData = await api.patch(endpoint, { imageUrl });
 
-            if (!response.ok) throw new Error("Failed to remove image");
-            
-            const updatedData = await response.json();
             setHistory(prev => prev.map(h => h._id === id ? { ...updatedData, type } : h));
         } catch (error) {
             console.error("Failed to remove image from record:", error);
@@ -140,16 +110,7 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const addTryOn = async (item: any) => {
         try {
-            const response = await fetch('/api/try-ons', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(item)
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `Server responded with ${response.status}`);
-            }
-            const data = await response.json();
+            const data = await api.post('/api/try-ons', item);
             console.log("Try-On saved successfully:", data);
             setHistory(prev => [{
                 ...data,
@@ -162,13 +123,7 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const deleteTryOn = async (id: string) => {
         try {
-            const response = await fetch(`/api/try-ons/${id}`, {
-                method: 'DELETE'
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `Server responded with ${response.status}`);
-            }
+            await api.delete(`/api/try-ons/${id}`);
             console.log("Try-On deleted successfully");
             setHistory(prev => prev.filter(h => h._id !== id));
         } catch (error) {
@@ -178,16 +133,7 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const updateTryOn = async (id: string, item: any) => {
         try {
-            const response = await fetch(`/api/try-ons/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(item)
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `Server responded with ${response.status}`);
-            }
-            const data = await response.json();
+            const data = await api.put(`/api/try-ons/${id}`, item);
             console.log("Try-On updated successfully:", data);
             setHistory(prev => prev.map(h => h._id === id ? { ...data, type: 'try-on' } : h));
         } catch (error) {

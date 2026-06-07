@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "tsx Backend/server.ts",
+    "build": "tsc -p tsconfig.json && vite build",
+    "build:backend": "tsc -p tsconfig.json",
+    "build:frontend": "vite build",
     "lint": "tsc --noEmit",
-    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {

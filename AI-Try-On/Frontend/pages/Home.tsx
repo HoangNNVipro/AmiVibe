@@ -16,6 +16,7 @@ import {
 import { processVirtualTryOn, generateVirtualModel } from '@/services/geminiService';
 import { useHistory } from '../context/HistoryContext';
 import { imageUrlToImageData } from '../lib/utils';
+import { api } from '../lib/apiClient';
 
 // Import local components
 import { ModelLibraryModal } from '../components/home/ModelLibraryModal';
@@ -62,21 +63,13 @@ const App: React.FC = () => {
         
         if (productIds.length > 0) {
           try {
-            const response = await fetch('/api/products/fetch-by-ids', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ ids: productIds })
-            });
-            
-            if (response.ok) {
-              const products = await response.json();
-              // Check both custom id and _id
-              const savedIds = products
-                .filter((p: any) => p.image && p.image.includes(saveToProductTarget.imageUrl))
-                .map((p: any) => p.id || p._id);
-              
-              setSelectedProductsForSaving(savedIds);
-            }
+            const products = await api.post('/api/products/fetch-by-ids', { ids: productIds });
+            // Check both custom id and _id
+            const savedIds = products
+              .filter((p: any) => p.image && p.image.includes(saveToProductTarget.imageUrl))
+              .map((p: any) => p.id || p._id);
+
+            setSelectedProductsForSaving(savedIds);
           } catch (error) {
             console.error('Error fetching initial product status:', error);
           }
@@ -104,21 +97,12 @@ const App: React.FC = () => {
         unselectedIds 
       });
 
-      const response = await fetch('/api/products/sync-images', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageUrl: saveToProductTarget.imageUrl,
-          selectedIds: selectedProductsForSaving,
-          unselectedIds: unselectedIds
-        })
+      const data = await api.post('/api/products/sync-images', {
+        imageUrl: saveToProductTarget.imageUrl,
+        selectedIds: selectedProductsForSaving,
+        unselectedIds: unselectedIds
       });
 
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || 'Failed to sync product images');
-      }
-      
       setSaveToProductTarget(null);
       setSelectedProductsForSaving([]);
     } catch (error) {
@@ -163,11 +147,8 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('/api/products');
-        if (res.ok) {
-          const data = await res.json();
-          setDbProducts(data);
-        }
+        const data = await api.get('/api/products');
+        setDbProducts(data);
       } catch (err) {
         console.error("Error fetching products:", err);
       }

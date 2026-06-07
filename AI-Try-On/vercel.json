@@ -1,8 +1,40 @@
 {
-    "rewrites": [
-      {
-        "source": "/(.*)",
-        "destination": "/"
+  "version": 2,
+  "builds": [
+    {
+      "src": "Backend/server.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["Backend/**"]
       }
-    ]
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist",
+        "buildCommand": "npm run build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "Backend/server.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "status": 200
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "@vite_api_url",
+    "GEMINI_API_KEY": "@gemini_api_key",
+    "MONGODB_URI": "@mongodb_uri",
+    "CLOUDINARY_NAME": "@cloudinary_name",
+    "CLOUDINARY_API_KEY": "@cloudinary_api_key",
+    "CLOUDINARY_SECRET_KEY": "@cloudinary_secret_key",
+    "JWT_SECRET": "@jwt_secret"
   }
+}

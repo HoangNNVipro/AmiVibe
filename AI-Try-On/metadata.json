@@ -1,8 +1,0 @@
-{
-  "name": "AI Virtual Try-On",
-  "description": "An advanced fashion application using Gemini AI to virtually try on clothes on models with high realism and style selection.",
-  "requestFramePermissions": [
-    "camera"
-  ],
-  "majorCapabilities": []
-}

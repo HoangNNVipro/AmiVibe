@@ -1,5 +1,14 @@
 import { ImageData } from '../types';
 
+const trimTrailingSlash = (value: string) => value.replace(/\/+$|^\s+|\s+$/g, '');
+const trimLeadingSlash = (value: string) => value.replace(/^\/+/, '');
+
+export const buildApiUrl = (base: string | undefined, path: string) => {
+  const normalizedBase = base ? trimTrailingSlash(base) : '';
+  const normalizedPath = trimLeadingSlash(path);
+  return normalizedBase ? `${normalizedBase}/${normalizedPath}` : `/${normalizedPath}`;
+};
+
 export const imageUrlToImageData = async (url: string): Promise<ImageData> => {
   const response = await fetch(url);
   const blob = await response.blob();

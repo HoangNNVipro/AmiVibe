@@ -1,7 +1,8 @@
 import express from "express";
-import { saveVirtualModel, getVirtualModels, updateVirtualModel, deleteVirtualModel, removeImageFromVirtualModel } from "../controllers/virtualModelController.ts";
-import { saveTryOn, getTryOns, updateTryOn, deleteTryOn, removeImageFromTryOn } from "../controllers/tryOnController.ts";
-import { getProducts, getProductsByIds, syncProductImages } from "../controllers/productController.ts";
+import { saveVirtualModel, getVirtualModels, updateVirtualModel, deleteVirtualModel, removeImageFromVirtualModel } from "../controllers/virtualModelController.js";
+import { saveTryOn, getTryOns, updateTryOn, deleteTryOn, removeImageFromTryOn } from "../controllers/tryOnController.js";
+import { getProducts, getProductsByIds, syncProductImages } from "../controllers/productController.js";
+import { generateVirtualModel, processVirtualTryOn } from "../controllers/aiController.js";
 
 const router = express.Router();
 
@@ -14,6 +15,10 @@ router.get("/health", (req, res) => {
 router.get("/products", getProducts);
 router.post("/products/fetch-by-ids", getProductsByIds);
 router.post("/products/sync-images", syncProductImages);
+
+// AI Routes
+router.post("/ai/generate-model", generateVirtualModel);
+router.post("/ai/process-try-on", processVirtualTryOn);
 
 // Virtual Model Routes
 router.get("/virtual-models", getVirtualModels);

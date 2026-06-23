@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",                          /* Phiên bản JS đầu ra phù hợp với Node.js mới */
+    "module": "NodeNext",                        /* Bắt buộc cho mô hình "type": "module" */
+    "moduleResolution": "NodeNext",              /* Cách Node tìm kiếm các file import */
+    "outDir": "./dist",                          /* Thư mục chứa file .js sau khi build */
+    "rootDir": "./",                             /* Thư mục gốc chứa file .ts */
+    "strict": false,                              /* Bật kiểm tra lỗi nghiêm ngặt của TS */
+    "esModuleInterop": true,                     /* Hỗ trợ import các thư viện CommonJS cũ */
+    "skipLibCheck": true,                        /* Bỏ qua kiểm tra lỗi trong node_modules để build nhanh hơn */
+    "forceConsistentCasingInFileNames": true     /* Tránh lỗi phân biệt chữ hoa/chữ thường trên Linux/Ubuntu */
+  },
+  "include": ["**/*.ts"],                        /* Biên dịch tất cả file .ts trong thư mục Backend */
+  "exclude": ["node_modules", "dist"]            /* Bỏ qua không biên dịch 2 thư mục này */
+}

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
@@ -9,26 +10,26 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
 // 1. FILTER HELPER COMPONENTS
 // ==========================================
 const FILTER_CATEGORY_OPTIONS = [
-  { value: 'All', label: 'All Categories' },
-  { value: 'Men', label: 'Men' },
-  { value: 'Women', label: 'Women' },
-  { value: 'Unisex', label: 'Unisex' },
+  { value: 'All' },
+  { value: 'Men' },
+  { value: 'Women' },
+  { value: 'Unisex' },
 ];
 
 const FILTER_SIZE_OPTIONS = [
-  { value: 'All', label: 'All Sizes' },
-  { value: 'S', label: 'Size S' },
-  { value: 'M', label: 'Size M' },
-  { value: 'L', label: 'Size L' },
-  { value: 'XL', label: 'Size XL' },
-  { value: 'XXL', label: 'Size XXL' },
+  { value: 'All' },
+  { value: 'S' },
+  { value: 'M' },
+  { value: 'L' },
+  { value: 'XL' },
+  { value: 'XXL' },
 ];
 
 const FILTER_STOCK_OPTIONS = [
-  { value: 'All', label: 'All Status' },
-  { value: 'InStock', label: 'In Stock (Healthy)' },
-  { value: 'LowStock', label: 'Low Stock (<= 5)' },
-  { value: 'OutOfStock', label: 'Out of Stock (0)' },
+  { value: 'All' },
+  { value: 'InStock' },
+  { value: 'LowStock' },
+  { value: 'OutOfStock' },
 ];
 
 // Reusable Dropdown
@@ -77,6 +78,31 @@ const FilterDropdown = ({ value, onChange, options }) => {
 // 2. MAIN COMPONENT (INVENTORY)
 // ==========================================
 const Inventory = ({ token }) => {
+  const { t } = useTranslation();
+
+  const categoryFilterOptions = useMemo(() => [
+    { value: 'All', label: 'All Categories' },
+    ...FILTER_CATEGORY_OPTIONS.filter((opt) => opt.value !== 'All').map((opt) => ({
+      value: opt.value,
+      label: opt.value,
+    })),
+  ], [t]);
+
+  const sizeFilterOptions = useMemo(() => [
+    { value: 'All', label: 'All Sizes' },
+    ...FILTER_SIZE_OPTIONS.filter((opt) => opt.value !== 'All').map((opt) => ({
+      value: opt.value,
+      label: `Size ${opt.value}`,
+    })),
+  ], [t]);
+
+  const stockFilterOptions = useMemo(() => [
+    { value: 'All', label: 'All Status' },
+    { value: 'InStock', label: 'In Stock (Healthy)' },
+    { value: 'LowStock', label: 'Low Stock (<= 5)' },
+    { value: 'OutOfStock', label: 'Out of Stock (0)' },
+  ], [t]);
+
   const [products, setProducts] = useState([]); 
   const [loading, setLoading] = useState(false);
   
@@ -229,7 +255,7 @@ const Inventory = ({ token }) => {
     setFilterCategory('All');
     setFilterSize('All');
     setFilterStock('All');
-    toast.info("Filters reset successfully");
+    toast.info(t('inventory_filters_reset_success'));
   };
 
   // -------------------------------------------------------------
@@ -239,7 +265,7 @@ const Inventory = ({ token }) => {
     e.preventDefault();
     const qty = parseInt(addQuantity);
     if (isNaN(qty) || qty <= 0) {
-      toast.error("Please enter a valid quantity (>0)");
+      toast.error(t('inventory_invalid_quantity'));
       return;
     }
 
@@ -255,7 +281,7 @@ const Inventory = ({ token }) => {
       );
 
       if (response.data.success) {
-        toast.success(`Added ${qty} items to stock (Size ${restockModal.size})`);
+        toast.success(t('inventory_restock_success', { quantity: qty, size: restockModal.size }));
         setRestockModal(null);
         setAddQuantity('');
         fetchInventory();
@@ -276,13 +302,13 @@ const Inventory = ({ token }) => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Inventory Management</h1>
-            <p className="text-sm text-slate-500 mt-1">Control stock levels, monitor sales, and manage variant restocking.</p>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('inventory_management_title')}</h1>
+            <p className="text-sm text-slate-500 mt-1">{t('inventory_management_subtitle')}</p>
           </div>
           <button 
             onClick={() => {
               fetchInventory();
-              toast.success("Data refreshed successfully");
+              toast.success(t('inventory_data_refreshed_success'));
             }}
             disabled={loading}
             className="self-start sm:self-auto flex items-center gap-2 px-3.5 py-2 border border-slate-200 bg-white hover:border-slate-350 rounded-lg hover:bg-slate-50 text-slate-600 text-xs font-semibold shadow-sm transition-all active:scale-95 group cursor-pointer disabled:opacity-70"
@@ -290,7 +316,7 @@ const Inventory = ({ token }) => {
             <svg className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-300 ${loading ? 'animate-spin' : 'group-hover:rotate-180'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
             </svg>
-            Refresh Data
+            {t('inventory_refresh_data')}
           </button>
         </div>
 
@@ -301,7 +327,7 @@ const Inventory = ({ token }) => {
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
             </div>
             <div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Imported</p>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('inventory_total_imported')}</p>
               <h4 className="text-lg font-bold text-slate-900 mt-0.5">{metrics.totalImported}</h4>
             </div>
           </div>
@@ -311,7 +337,7 @@ const Inventory = ({ token }) => {
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
             </div>
             <div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Remaining Stock</p>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('inventory_remaining_stock')}</p>
               <h4 className="text-lg font-bold text-slate-900 mt-0.5">{metrics.totalRemaining}</h4>
             </div>
           </div>
@@ -321,7 +347,7 @@ const Inventory = ({ token }) => {
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
             <div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Sold</p>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('inventory_total_sold')}</p>
               <h4 className="text-lg font-bold text-slate-900 mt-0.5">{metrics.totalSold}</h4>
             </div>
           </div>
@@ -331,8 +357,8 @@ const Inventory = ({ token }) => {
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             </div>
             <div>
-              <p className="text-[11px] font-bold text-rose-500 uppercase tracking-wider">Alerts (Low/Out)</p>
-              <h4 className="text-lg font-bold text-rose-600 mt-0.5">{metrics.lowStockCount} Variants</h4>
+              <p className="text-[11px] font-bold text-rose-500 uppercase tracking-wider">{t('inventory_alerts_low_out')}</p>
+              <h4 className="text-lg font-bold text-rose-600 mt-0.5">{t('inventory_alerts_variants', { count: metrics.lowStockCount })}</h4>
             </div>
           </div>
         </div>
@@ -346,24 +372,28 @@ const Inventory = ({ token }) => {
               </span>
               <input 
                 type="text" 
-                placeholder="Search by product name..."
+                placeholder={t('inventory_search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-850 bg-slate-50/50"
               />
             </div>
-            <FilterDropdown value={filterCategory} onChange={setFilterCategory} options={FILTER_CATEGORY_OPTIONS} />
-            <FilterDropdown value={filterSize} onChange={setFilterSize} options={FILTER_SIZE_OPTIONS} />
-            <FilterDropdown value={filterStock} onChange={setFilterStock} options={FILTER_STOCK_OPTIONS} />
+            <FilterDropdown value={filterCategory} onChange={setFilterCategory} options={categoryFilterOptions} />
+            <FilterDropdown value={filterSize} onChange={setFilterSize} options={sizeFilterOptions} />
+            <FilterDropdown value={filterStock} onChange={setFilterStock} options={stockFilterOptions} />
           </div>
 
           {(searchQuery || filterCategory !== 'All' || filterSize !== 'All' || filterStock !== 'All') && (
             <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
               <span className="text-slate-400">
-                Found <b className="text-slate-700">{filteredVariants.length}</b> matching variants.
+                <Trans
+                  i18nKey="inventory_found_matching_variants"
+                  values={{ count: filteredVariants.length }}
+                  components={{ b: <b className="text-slate-700" /> }}
+                />
               </span>
               <button onClick={handleResetFilters} className="text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer">
-                Clear all filters &times;
+                {t('inventory_clear_filters')} &times;
               </button>
             </div>
           )}
@@ -377,30 +407,30 @@ const Inventory = ({ token }) => {
              </div>
           ) : filteredVariants.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-slate-400">
-              <p className="text-sm font-semibold text-slate-600">No variants found</p>
+              <p className="text-sm font-semibold text-slate-600">{t('inventory_no_variants_found')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-separate border-spacing-y-3">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider select-none">
-                    <th className="py-4 px-4 w-20">Image</th>
+                    <th className="py-4 px-4 w-20">{t('inventory_image')}</th>
                     <th className="py-4 px-3 cursor-pointer hover:text-slate-700" onClick={() => requestSort('name')}>
-                      Product Name {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      {t('inventory_product_name')} {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </th>
                     <th className="py-4 px-3 w-20 cursor-pointer hover:text-slate-700" onClick={() => requestSort('size')}>
-                      Size {sortConfig.key === 'size' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      {t('inventory_size')} {sortConfig.key === 'size' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </th>
                     <th className="py-4 px-3 w-24 text-center cursor-pointer hover:text-slate-700" onClick={() => requestSort('total')}>
-                      Total {sortConfig.key === 'total' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      {t('inventory_total')} {sortConfig.key === 'total' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </th>
                     <th className="py-4 px-3 w-24 text-center cursor-pointer hover:text-slate-700" onClick={() => requestSort('sold')}>
-                      Sold {sortConfig.key === 'sold' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      {t('inventory_sold')} {sortConfig.key === 'sold' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </th>
                     <th className="py-4 px-3 w-24 text-center cursor-pointer hover:text-slate-700" onClick={() => requestSort('remaining')}>
-                      Remaining {sortConfig.key === 'remaining' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      {t('inventory_remaining')} {sortConfig.key === 'remaining' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th className="py-4 px-4 text-right w-32">Actions</th>
+                    <th className="py-4 px-4 text-right w-32">{t('inventory_actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 text-sm">
@@ -439,7 +469,7 @@ const Inventory = ({ token }) => {
                           title="Click to restock this variant"
                         >
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-                          Restock
+                          {t('inventory_restock')}
                         </button>
                       </td>
                     </tr>
@@ -453,7 +483,15 @@ const Inventory = ({ token }) => {
           {filteredVariants.length > 0 && !loading && (
             <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
               <span className="text-slate-400 font-medium">
-                Showing <b className="text-slate-700">{Math.min(filteredVariants.length, (currentPage - 1) * itemsPerPage + 1)}-{Math.min(filteredVariants.length, currentPage * itemsPerPage)}</b> of <b className="text-slate-700">{filteredVariants.length}</b> variants
+                <Trans
+                  i18nKey="inventory_showing_variants"
+                  values={{
+                    start: Math.min(filteredVariants.length, (currentPage - 1) * itemsPerPage + 1),
+                    end: Math.min(filteredVariants.length, currentPage * itemsPerPage),
+                    total: filteredVariants.length,
+                  }}
+                  components={{ b: <b className="text-slate-700" /> }}
+                />
               </span>
               <div className="flex items-center gap-2">
                 <button
@@ -462,7 +500,7 @@ const Inventory = ({ token }) => {
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   className="px-3 py-1.5 border border-slate-200 bg-white hover:bg-slate-50 rounded-lg text-slate-600 font-bold transition-all disabled:opacity-40 disabled:hover:bg-white cursor-pointer"
                 >
-                  Prev
+                  {t('inventory_prev')}
                 </button>
                 {Array.from({ length: totalPages }).map((_, idx) => (
                   <button
@@ -480,7 +518,7 @@ const Inventory = ({ token }) => {
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   className="px-3 py-1.5 border border-slate-200 bg-white hover:bg-slate-50 rounded-lg text-slate-600 font-bold transition-all disabled:opacity-40 disabled:hover:bg-white cursor-pointer"
                 >
-                  Next
+                  {t('inventory_next')}
                 </button>
               </div>
             </div>
@@ -503,21 +541,21 @@ const Inventory = ({ token }) => {
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900 leading-tight">Restock Item</h3>
-                <p className="text-[11px] text-slate-500">Add quantity from incoming shipments</p>
+                <h3 className="text-base font-bold text-slate-900 leading-tight">{t('inventory_restock_item')}</h3>
+                <p className="text-[11px] text-slate-500">{t('inventory_restock_subtitle')}</p>
               </div>
             </div>
 
             <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 mb-5">
               <p className="text-xs font-semibold text-slate-700 line-clamp-1">{restockModal.name}</p>
               <div className="flex justify-between items-center mt-2">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Size: <span className="text-slate-900 bg-white border px-1.5 py-0.5 rounded">{restockModal.size}</span></span>
-                <span className="text-xs font-semibold text-slate-500">Remaining: <span className="text-slate-900 font-bold">{restockModal.remaining}</span></span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t('inventory_size')}: <span className="text-slate-900 bg-white border px-1.5 py-0.5 rounded">{restockModal.size}</span></span>
+                <span className="text-xs font-semibold text-slate-500">{t('inventory_remaining')}: <span className="text-slate-900 font-bold">{restockModal.remaining}</span></span>
               </div>
             </div>
 
             <div className="mb-6">
-              <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-2">Quantity to Add <span className="text-rose-500">*</span></label>
+              <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-2">{t('inventory_quantity_to_add')} <span className="text-rose-500">*</span></label>
               <input 
                 type="number"
                 min="1"
@@ -528,12 +566,15 @@ const Inventory = ({ token }) => {
                 className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-semibold text-slate-900"
               />
               <p className="text-[10px] text-slate-400 mt-2">
-                The system will add this quantity to both <b className="text-slate-600">Total Imported</b> and <b className="text-slate-600">Remaining Stock</b>.
+                <Trans
+                  i18nKey="inventory_restock_note"
+                  components={{ b: <b className="text-slate-600" /> }}
+                />
               </p>
             </div>
 
             <button type="submit" className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl shadow-md transition-colors active:scale-95 cursor-pointer">
-              Confirm Restock
+              {t('inventory_confirm_restock')}
             </button>
           </form>
         </div>

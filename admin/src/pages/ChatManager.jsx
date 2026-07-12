@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import { backendUrl } from '../App';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
@@ -150,6 +151,16 @@ const UserAvatar = ({ name }) => {
 };
 
 const ChatManager = ({ token }) => {
+  const { t } = useTranslation();
+
+  const getChatFilterLabel = (status, withEmoji = false) => {
+    if (status === 'All') return t('chat_all');
+    if (status === 'waiting_for_admin') return withEmoji ? `🔴 ${t('chat_urgent_label')}` : t('chat_urgent_label');
+    if (status === 'in_progress') return withEmoji ? `🔵 ${t('chat_active_label')}` : t('chat_active_label');
+    if (status === 'resolved') return withEmoji ? `⚪ ${t('chat_closed_label')}` : t('chat_closed_label');
+    return status;
+  };
+
   const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
   const [inputValue, setInputValue] = useState('');
@@ -371,7 +382,7 @@ const ChatManager = ({ token }) => {
           status: 'in_progress'
         }));
       } else {
-        toast.error(response?.message || 'Could not connect to the chat room');
+        toast.error(response?.message || t('chat_failed_to_connect'));
       }
     });
   };
@@ -454,7 +465,7 @@ const ChatManager = ({ token }) => {
       if (response?.success) {
         setInputValue('');
       } else {
-        toast.error('Failed to send message.');
+        toast.error(t('chat_failed_to_send'));
       }
     });
   };
@@ -468,7 +479,7 @@ const ChatManager = ({ token }) => {
       );
       setActiveChat(null);
       activeChatUserIdRef.current = null;
-      toast.success('Support session resolved.');
+      toast.success(t('chat_support_resolved'));
       return;
     }
 
@@ -476,9 +487,9 @@ const ChatManager = ({ token }) => {
       if (response?.success) {
         setActiveChat(null);
         activeChatUserIdRef.current = null;
-        toast.success('Session resolved successfully.');
+        toast.success(t('chat_session_resolved'));
       } else {
-        toast.error('Failed to resolve support session.');
+        toast.error(t('chat_failed_to_resolve'));
       }
     });
   };
@@ -552,7 +563,7 @@ const ChatManager = ({ token }) => {
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    Close Support
+                    {t('chat_close_support')}
                   </button>
                 </div>
                 
@@ -606,7 +617,7 @@ const ChatManager = ({ token }) => {
                       type="button"
                       onClick={() => setShowEmojiPicker(prev => !prev)}
                       className={`p-1 text-slate-400/60 hover:text-[#4364F7] transition duration-200 hover:scale-105 active:scale-95 ${showEmojiPicker ? 'text-[#4364F7]' : ''}`}
-                      title="Insert Emoji"
+                      title={t('chat_insert_emoji')}
                     >
                       <svg 
                         viewBox="0 0 24 24" 
@@ -627,7 +638,7 @@ const ChatManager = ({ token }) => {
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="Type Admin's reply..."
+                      placeholder={t('chat_placeholder_reply')}
                       rows={1}
                       className="flex-1 max-h-[60px] resize-none bg-transparent text-sm outline-none py-1 text-slate-800 placeholder-slate-400 border-none focus:ring-0 focus:outline-none"
                     />
@@ -638,7 +649,7 @@ const ChatManager = ({ token }) => {
                       onClick={() => handleSendAdminMessage()}
                       disabled={!inputValue.trim()}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-[#0052D4] via-[#4364F7] to-[#6FB1FC] text-white shadow-sm transition-all duration-200 hover:opacity-95 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:scale-100 disabled:shadow-none shrink-0"
-                      title="Send message"
+                      title={t('chat_send_message')}
                     >
                       <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current transform translate-x-[1.5px] translate-y-[0.5px]">
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
@@ -656,8 +667,8 @@ const ChatManager = ({ token }) => {
                     <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
-                <p className="text-sm font-semibold text-slate-600">Support Chatbox Empty</p>
-                <p className="text-xs text-slate-450 mt-1">Select a conversation from the list on the right to start assisting the customer.</p>
+                <p className="text-sm font-semibold text-slate-600">{t('chat_support_empty_title')}</p>
+                <p className="text-xs text-slate-450 mt-1">{t('chat_support_empty_subtitle')}</p>
               </div>
             )}
           </div>
@@ -668,12 +679,12 @@ const ChatManager = ({ token }) => {
             {/* Header thanh Sidebar */}
             <div className="p-4 border-b border-slate-100 bg-slate-900 text-white flex justify-between items-center shrink-0">
               <div>
-                <h2 className="font-bold text-sm tracking-wide">Online Customers</h2>
-                <p className="text-[10px] text-slate-400 font-medium">Support conversation rooms</p>
+                <h2 className="font-bold text-sm tracking-wide">{t('chat_online_customers')}</h2>
+                <p className="text-[10px] text-slate-400 font-medium">{t('chat_support_conversation_rooms')}</p>
               </div>
               {USE_MOCK && (
                 <span className="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider">
-                  MOCK MODE
+                  {t('chat_mock_mode')}
                 </span>
               )}
             </div>
@@ -682,22 +693,22 @@ const ChatManager = ({ token }) => {
             <div className="grid grid-cols-2 gap-2 p-3 bg-slate-50/50 border-b border-slate-100 text-[11px] font-medium text-slate-500 shrink-0">
               <div className="flex items-center gap-1.5 bg-white p-1.5 rounded-lg border border-slate-200/60 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-slate-400 shrink-0" />
-                <span className="truncate">Total: <strong className="text-slate-800">{metrics.total}</strong></span>
+                <span className="truncate">{t('chat_total')} <strong className="text-slate-800">{metrics.total}</strong></span>
               </div>
               <div className="flex items-center gap-1.5 bg-white p-1.5 rounded-lg border border-slate-200/60 shadow-2xs">
                 <span className="relative flex h-2 w-2 shrink-0">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
                 </span>
-                <span className="truncate text-rose-600 font-semibold">Urgent: <strong>{metrics.waiting}</strong></span>
+                <span className="truncate text-rose-600 font-semibold">{t('chat_urgent')} <strong>{metrics.waiting}</strong></span>
               </div>
               <div className="flex items-center gap-1.5 bg-white p-1.5 rounded-lg border border-slate-200/60 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 animate-pulse" />
-                <span className="truncate text-blue-600">Active: <strong>{metrics.inProgress}</strong></span>
+                <span className="truncate text-blue-600">{t('chat_active')} <strong>{metrics.inProgress}</strong></span>
               </div>
               <div className="flex items-center gap-1.5 bg-white p-1.5 rounded-lg border border-slate-200/60 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                <span className="truncate text-emerald-600">Closed: <strong>{metrics.resolved}</strong></span>
+                <span className="truncate text-emerald-600">{t('chat_closed')} <strong>{metrics.resolved}</strong></span>
               </div>
             </div>
 
@@ -714,7 +725,7 @@ const ChatManager = ({ token }) => {
                   type="text" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search name..."
+                  placeholder={t('chat_search_placeholder')}
                   className="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-xs outline-none bg-white focus:border-[#4364F7] transition"
                 />
               </div>
@@ -725,7 +736,7 @@ const ChatManager = ({ token }) => {
                   onClick={() => setIsFilterOpen(!isFilterOpen)}
                   className="px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs bg-white flex items-center gap-1 hover:bg-slate-50 cursor-pointer"
                 >
-                  <span className="max-w-[70px] truncate">{statusFilter === 'All' ? 'All' : statusFilter === 'waiting_for_admin' ? 'Urgent' : statusFilter === 'in_progress' ? 'Active' : 'Closed'}</span>
+                  <span className="max-w-[70px] truncate">{getChatFilterLabel(statusFilter)}</span>
                   <svg className="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path d="M19 9l-7 7-7-7" />
                   </svg>
@@ -738,7 +749,7 @@ const ChatManager = ({ token }) => {
                         onClick={() => { setStatusFilter(st); setIsFilterOpen(false); }}
                         className={`px-3 py-1.5 text-xs cursor-pointer transition ${statusFilter === st ? 'bg-blue-50 font-bold text-blue-600' : 'text-slate-600 hover:bg-slate-50'}`}
                       >
-                        {st === 'All' ? 'All' : st === 'waiting_for_admin' ? '🔴 Urgent' : st === 'in_progress' ? '🔵 Active' : '⚪ Closed'}
+                        {getChatFilterLabel(st, true)}
                       </div>
                     ))}
                   </div>
@@ -750,7 +761,7 @@ const ChatManager = ({ token }) => {
             <div className="flex-1 overflow-y-auto divide-y divide-slate-100/60 scrollbar-thin">
               {sortedChats.length === 0 ? (
                 <div className="p-8 text-center text-slate-400">
-                  <p className="text-xs">No matching chat rooms found.</p>
+                  <p className="text-xs">{t('chat_no_matching_rooms')}</p>
                 </div>
               ) : (
                 sortedChats.map((chat) => {

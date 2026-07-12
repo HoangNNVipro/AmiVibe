@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ShopContext } from '../context/ShopContext'
 import Title from './Title'
 import ProductItem from './ProductItem'
 
 const LatestCollection = () => {
+  const { t } = useTranslation();
   const { products } = useContext(ShopContext);
   const [latestProducts, setLatestProducts] = useState([]);
 
@@ -14,9 +16,9 @@ const LatestCollection = () => {
   return (
     <div className='my-10'>
       <div className='text-center py-8 text-3xl'>
-        <Title text1={'LATEST'} text2={'COLLECTIONS'} />
+        <Title text1={t('latest')} text2={t('collections')} />
         <p className='w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600'>
-        AmiVibe is truly the ultimate destination for trendy and high-quality fashion apparel. AmiVibe has become our customer's favorite.
+        {t('latest_collections_description')}
         </p>
       </div>
       {/* Rendering Products */}

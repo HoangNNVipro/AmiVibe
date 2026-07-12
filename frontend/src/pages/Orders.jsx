@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ShopContext } from '../context/ShopContext'
 import Title from '../components/Title'
 import axios from 'axios'
@@ -6,6 +7,7 @@ import { toast } from 'react-toastify'
 
 const Orders = () => {
   const { backendUrl, token, currency } = useContext(ShopContext);
+  const { t } = useTranslation();
   const [orderData, setOrderData] = useState([]);
   
   // Trạng thái loading toàn trang (chỉ dùng khi vào trang lần đầu)
@@ -63,18 +65,18 @@ const Orders = () => {
   return (
     <div className='pt-10 sm:pt-16 min-h-screen bg-white'>
       <div className='text-2xl mb-8'>
-        <Title text1={'MY'} text2={'ORDERS'}/>
+        <Title text1={t('my')} text2={t('orders')}/>
       </div>
       
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-500 text-sm font-medium">Loading your orders...</p>
+          <p className="mt-4 text-gray-500 text-sm font-medium">{t('orders_loading')}</p>
         </div>
       ) : (
         <div className='space-y-6'>
           {orderData.length === 0 ? (
-             <div className="text-center py-16 text-gray-500">You haven't placed any orders yet.</div>
+             <div className="text-center py-16 text-gray-500">{t('orders_empty')}</div>
           ) : (
             orderData.map((order, index) => (
               <div key={index} className='bg-white rounded-2xl border border-slate-100 shadow-sm hover:border-indigo-100 hover:shadow-md transition-all duration-200 overflow-hidden'>
@@ -83,7 +85,7 @@ const Orders = () => {
                 <div className="bg-slate-50/70 px-4 sm:px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <span className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                      Order Time: 
+                      {t('orders_time')} 
                       <span className="font-medium text-slate-500">
                         {new Date(order.date).toLocaleDateString()} at {new Date(order.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                       </span>
@@ -101,7 +103,7 @@ const Orders = () => {
                   {/* Cột trái: Danh sách sản phẩm */}
                   <div className='lg:col-span-8 space-y-3'>
                     <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-                      Items Ordered ({order.items.length})
+                      {t('orders_items_ordered')} ({order.items.length})
                     </h4>
                     <div className='divide-y divide-slate-100'>
                       {order.items.map((item, itemIndex) => (
@@ -127,10 +129,10 @@ const Orders = () => {
                   {/* Cột phải: Thanh toán & Nút bấm */}
                   <div className='lg:col-span-4 bg-slate-50/50 p-4 sm:p-5 rounded-2xl border border-slate-100/70 flex flex-col justify-between h-full space-y-4'>
                     <div>
-                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Order Summary</h4>
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">{t('orders_order_summary')}</h4>
                       
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-slate-500">Total Amount:</span>
+                        <span className="text-sm text-slate-500">{t('orders_total_amount')}</span>
                         <span className="text-lg font-extrabold text-slate-900">
                           {currency}{order.amount.toLocaleString()}
                         </span>
@@ -138,20 +140,20 @@ const Orders = () => {
 
                       <div className="space-y-2 mt-4 text-xs sm:text-sm border-t border-slate-100 pt-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-500">Method:</span>
+                          <span className="text-slate-500">{t('orders_method')}</span>
                           <span className="font-bold text-slate-700 uppercase bg-white border border-slate-100 shadow-sm px-2 py-0.5 rounded-md text-[11px]">
                             {order.paymentMethod}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-500">Payment:</span>
+                          <span className="text-slate-500">{t('orders_payment')}</span>
                           {order.payment ? (
                             <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full text-[10px]">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Completed
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {t('orders_completed')}
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1.5 font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full text-[10px]">
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pending
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> {t('orders_pending')}
                             </span>
                           )}
                         </div>
@@ -174,7 +176,7 @@ const Orders = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg>
                         )}
-                        {trackingOrderId === order._id ? 'Tracking...' : 'Track Order'}
+                        {trackingOrderId === order._id ? t('orders_tracking') : t('orders_track_order')}
                       </button>
                     </div>
                   </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from 'react-i18next';
 import Title from "../components/Title";
 import CartTotal from "../components/CartTotal";
 import { assets } from "../assets/assets";
@@ -10,6 +11,7 @@ import { toast } from "react-toastify";
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState("cod");
+  const { t } = useTranslation();
   const {
     navigate,
     backendUrl,
@@ -128,7 +130,7 @@ const PlaceOrder = () => {
           break;
 
         default:
-          toast.error('Invalid payment method');
+          toast.error(t('invalid_payment_method'));
           break;
       }
     } catch (error) {
@@ -145,7 +147,7 @@ const PlaceOrder = () => {
       {/*---------------- Left Side ----------------*/}
       <div className="flex flex-col gap-4 w-full sm:max-w-[480px]">
         <div className="text-xl sm:text-2xl my-3">
-          <Title text1={"DELIVERY"} text2={"INFORMATION"} />
+          <Title text1={t('delivery')} text2={t('information')} />
         </div>
         <div className="flex gap-3">
           <input
@@ -155,7 +157,7 @@ const PlaceOrder = () => {
             value={formData.firstName}
             className="border border-gray-300 rounded-lg py-2 px-3.5 w-full outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
             type="text"
-            placeholder="First name"
+            placeholder={t('first_name_placeholder')}
           />
           <input
             required
@@ -164,7 +166,7 @@ const PlaceOrder = () => {
             value={formData.lastName}
             className="border border-gray-300 rounded-lg py-2 px-3.5 w-full outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
             type="text"
-            placeholder="Last name"
+            placeholder={t('last_name_placeholder')}
           />
         </div>
         <input
@@ -174,7 +176,7 @@ const PlaceOrder = () => {
           value={formData.email}
           className="border border-gray-300 rounded-lg py-2 px-3.5 w-full outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
           type="mail"
-          placeholder="Email address"
+          placeholder={t('email_address_placeholder')}
         />
         <input
           required
@@ -183,7 +185,7 @@ const PlaceOrder = () => {
           value={formData.street}
           className="border border-gray-300 rounded-lg py-2 px-3.5 w-full outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
           type="text"
-          placeholder="Street"
+          placeholder={t('street_placeholder')}
         />
         <div className="flex gap-3">
           <input
@@ -193,7 +195,7 @@ const PlaceOrder = () => {
             value={formData.city}
             className="border border-gray-300 rounded-lg py-2 px-3.5 w-full outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
             type="text"
-            placeholder="City"
+            placeholder={t('city_placeholder')}
           />
           <input
             onChange={onChangeHandler}
@@ -201,7 +203,7 @@ const PlaceOrder = () => {
             value={formData.state}
             className="border border-gray-300 rounded-lg py-2 px-3.5 w-full outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
             type="text"
-            placeholder="State"
+            placeholder={t('state_placeholder')}
           />
         </div>
         <div className="flex gap-3">
@@ -212,7 +214,7 @@ const PlaceOrder = () => {
             value={formData.zipcode}
             className="border border-gray-300 rounded-lg py-2 px-3.5 w-full outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
             type="number"
-            placeholder="Zipcode"
+            placeholder={t('zipcode_placeholder')}
           />
           <input
             required
@@ -221,7 +223,7 @@ const PlaceOrder = () => {
             value={formData.country}
             className="border border-gray-300 rounded-lg py-2 px-3.5 w-full outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
             type="text"
-            placeholder="Country"
+            placeholder={t('country_placeholder')}
           />
         </div>
         <input
@@ -231,7 +233,7 @@ const PlaceOrder = () => {
           value={formData.phone}
           className="border border-gray-300 rounded-lg py-2 px-3.5 w-full outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
           type="number"
-          placeholder="Phone"
+          placeholder={t('phone_placeholder')}
         />
       </div>
 
@@ -242,7 +244,7 @@ const PlaceOrder = () => {
         </div>
 
         <div className="mt-12">
-          <Title text1={"PAYMENT"} text2={"METHOD"} />
+          <Title text1={t('payment')} text2={t('method')} />
           {/* --- Payment Method Selection --- */}
           {/* Đã trả về đúng cấu trúc gap-3 flex-col lg:flex-row của bạn để nút tự co giãn, không ép w-full */}
           <div className="flex gap-3 flex-col lg:flex-row">
@@ -286,7 +288,7 @@ const PlaceOrder = () => {
                 }`}
               ></p>
               <p className="text-gray-600 text-sm font-medium mx-4">
-                CASH ON DELIVERY
+                {t('cash_on_delivery')}
               </p>
             </div>
           </div>
@@ -296,7 +298,7 @@ const PlaceOrder = () => {
               type="submit"
               className="bg-black text-white px-16 py-3 text-sm font-medium rounded-full hover:bg-gray-800 hover:shadow-lg active:scale-95 transition-all duration-300"
             >
-              PLACE ORDER
+              {t('place_order')}
             </button>
           </div>
         </div>

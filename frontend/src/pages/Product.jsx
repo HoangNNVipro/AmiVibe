@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext';
 import { assets } from '../assets/assets'
@@ -7,6 +8,7 @@ import RelatedProducts from '../components/RelatedProducts'
 const Product = () => {
   const { productId } = useParams();
   const { products, currency, addToCart } = useContext(ShopContext);
+  const { t } = useTranslation();
 
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState('');
@@ -36,6 +38,17 @@ const Product = () => {
       setProductData(item);
       setImage(item.image?.[0] || '');
       setSize(item.sizes?.[0] || '');
+    }
+  }
+
+  const handleTryOnWithAI = () => {
+    if (productData && productData.image && productData.image.length > 0) {
+      const imagesParam = encodeURIComponent(JSON.stringify(productData.image));
+      const aiUrl = `http://localhost:4200?images=${imagesParam}`;
+      window.open(aiUrl, '_blank');
+    } else {
+      console.error('No product images available for AI Try-On');
+      alert(t('product_try_on_ai_no_images'));
     }
   }
 
@@ -154,7 +167,7 @@ const Product = () => {
         
         {/* 1. PRODUCT BREADCRUMBS & BADGES */}
         <div className="text-xs text-slate-400 font-semibold tracking-wider uppercase mb-5 flex items-center gap-2">
-          <span className="hover:text-slate-900 cursor-pointer transition-colors">Home</span>
+          <span className="hover:text-slate-900 cursor-pointer transition-colors">{t('product_home_breadcrumb')}</span>
           <span>/</span>
           <span className="hover:text-slate-900 cursor-pointer transition-colors">{productData.category}</span>
           <span>/</span>
@@ -163,7 +176,7 @@ const Product = () => {
           {productData.bestseller && (
             <>
               <span className="ml-2">&bull;</span>
-              <span className="text-amber-500 font-bold tracking-widest bg-amber-50 px-2 py-0.5 rounded-sm">BESTSELLER</span>
+              <span className="text-amber-500 font-bold tracking-widest bg-amber-50 px-2 py-0.5 rounded-sm">{t('product_bestseller_badge')}</span>
             </>
           )}
         </div>
@@ -184,7 +197,7 @@ const Product = () => {
               {/* Nút gợi ý zoom nổi lên khi hover */}
               <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-2 text-xs font-semibold text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity">
                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
-                 Click to Zoom
+                 {t('product_click_to_zoom')}
               </div>
             </div>
 
@@ -225,14 +238,14 @@ const Product = () => {
                 <img src={assets.star_icon} alt="star" className="w-4 h-4"/>
                 <img src={assets.star_icon} alt="star" className="w-4 h-4"/>
                 <img src={assets.star_dull_icon} alt="star dull" className="w-4 h-4 grayscale opacity-30"/>
-                <span className='pl-2 text-sm text-slate-500 font-medium'>(122 Reviews)</span>
+                <span className='pl-2 text-sm text-slate-500 font-medium'>{t('product_reviews_count')}</span>
               </div>
               
               <div className="w-px h-4 bg-slate-200"></div>
               
               <span className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide
                 ${productData.inStock !== false ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
-                {productData.inStock !== false ? 'In Stock' : 'Out Of Stock'}
+                {productData.inStock !== false ? t('product_in_stock') : t('product_out_of_stock')}
               </span>
             </div>
 
@@ -243,19 +256,19 @@ const Product = () => {
             {/* Detailed specifications Grid */}
             <div className="mt-8 bg-slate-50/80 p-5 rounded-2xl border border-slate-100 grid grid-cols-2 gap-y-5 gap-x-4 text-sm max-w-xl">
               <div>
-                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px] mb-1">Apparel Style</span>
+                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px] mb-1">{t('product_apparel_style')}</span>
                 <span className="text-slate-800 font-bold">{productData.styles ? productData.styles.join(', ') : 'Classic Casual'}</span>
               </div>
               <div>
-                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px] mb-1">Construct Material</span>
+                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px] mb-1">{t('product_construct_material')}</span>
                 <span className="text-slate-800 font-bold">{productData.materials ? productData.materials.join(', ') : 'Premium Blend'}</span>
               </div>
               <div>
-                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px] mb-1">Target Seasons</span>
+                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px] mb-1">{t('product_target_seasons')}</span>
                 <span className="text-slate-800 font-bold">{productData.seasons ? productData.seasons.join(', ') : 'All Seasons'}</span>
               </div>
               <div>
-                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px] mb-1">Fit Type Cut</span>
+                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px] mb-1">{t('product_fit_type_cut')}</span>
                 <span className="text-slate-800 font-bold">{productData.fit || 'Standard Regular Fit'}</span>
               </div>
             </div>
@@ -263,8 +276,8 @@ const Product = () => {
             {/* Size Selector */}
             <div className='flex flex-col gap-3 my-8'>
               <div className="flex items-center justify-between max-w-md">
-                <p className="text-sm font-bold text-slate-800 uppercase tracking-wider">Select Size</p>
-                <span className="text-xs text-indigo-600 font-semibold cursor-pointer hover:underline">Size Guide</span>
+                <p className="text-sm font-bold text-slate-800 uppercase tracking-wider">{t('product_select_size')}</p>
+                <span className="text-xs text-indigo-600 font-semibold cursor-pointer hover:underline">{t('product_size_guide')}</span>
               </div>
               
               <div className='flex flex-wrap gap-2.5'>
@@ -290,19 +303,33 @@ const Product = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 max-w-md">
+            <div className="flex gap-3.5 max-w-xl w-full">
+              
+              {/* NÚT THÊM VÀO GIỎ HÀNG */}
               <button 
                 onClick={() => addToCart(productData._id, size)} 
                 disabled={isCurrentSizeOutOfStock || productData.inStock === false}
-                className='flex-1 bg-slate-950 hover:bg-slate-850 text-white font-bold py-4 rounded-xl shadow-lg shadow-slate-900/20 active:scale-95 transition-all duration-200 text-sm tracking-wide disabled:opacity-50 disabled:cursor-not-allowed'
+                className='flex-[1.5] bg-slate-950 hover:bg-slate-800 text-white font-bold py-2.5 sm:py-3 px-4 rounded-xl shadow-lg shadow-slate-900/15 active:scale-[0.98] transition-all duration-200 text-xs sm:text-sm tracking-wide disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
               >
-                {isCurrentSizeOutOfStock ? 'OUT OF STOCK' : 'ADD TO CART'}
-              </button>
-              <button className="w-14 h-14 flex items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:border-slate-400 hover:text-slate-900 transition-colors bg-white hover:bg-slate-50 cursor-pointer shadow-sm">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
+                <span>{isCurrentSizeOutOfStock ? t('product_out_of_stock_button') : t('product_add_to_cart')}</span>
               </button>
+              
+              {/* NÚT THỬ ĐỒ ẢO AI */}
+              <button 
+                onClick={handleTryOnWithAI}
+                className="flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white font-bold py-2.5 sm:py-3 px-3 rounded-xl shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer text-xs sm:text-sm tracking-wide flex items-center justify-center gap-1.5 group"
+                title="AI Virtual Try-On"
+              >
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 3c.3 0 .6.2.7.5l1.4 4.1c.3.9 1 1.6 1.9 1.9l4.1 1.4c.3.1.5.4.5.7s-.2.6-.5.7l-4.1 1.4c-.9.3-1.6 1-1.9 1.9l-1.4 4.1c-.1.3-.4.5-.7.5s-.6-.2-.7-.5l-1.4-4.1c-.3-.9-1-1.6-1.9-1.9l-4.1-1.4c-.3-.1-.5-.4-.5-.7s.2-.6.5-.7l4.1-1.4c.9-.3 1.6-1 1.9-1.9l1.4-4.1c.1-.3.4-.5.7-.5z" />
+                  <path d="M19 4c.2 0 .4.1.4.3l.6 1.7c.1.4.4.7.8.8l1.7.6c.2.1.3.3.3.4s-.1.4-.3.4l-1.7.6c-.4.1-.7.4-.8.8l-.6 1.7c-.1.2-.3.3-.4.3s-.4-.1-.4-.3l-.6-1.7c-.1-.4-.4-.7-.8-.8l-1.7-.6c-.2-.1-.3-.3-.3-.4s.1-.4.3-.4l1.7-.6c.4-.1.7-.4.8-.8l.6-1.7c.1-.2.3-.3.4-.3z" opacity="0.8" />
+                </svg>
+                <span>{t('product_try_on_ai')}</span>
+              </button>
+
             </div>
             
             <hr className='mt-10 mb-6 border-slate-100 max-w-md' />
@@ -311,15 +338,15 @@ const Product = () => {
             <div className='text-xs text-slate-500 flex flex-col gap-2.5 font-medium'>
               <p className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                100% Original and Authentic product.
+                {t('product_original')}
               </p>
               <p className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                Cash on delivery is available on this item.
+                {t('product_cash_on_delivery')}
               </p>
               <p className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                Easy return and exchange policy within 7 days.
+                {t('product_return_policy')}
               </p>
             </div>
           </div>
@@ -334,14 +361,14 @@ const Product = () => {
               className={`px-6 py-3 text-sm font-bold transition-colors cursor-pointer border-b-2 
                 ${activeTab === 'description' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
             >
-              Product Description
+              {t('product_description_tab')}
             </button>
             <button 
               onClick={() => setActiveTab('reviews')}
               className={`px-6 py-3 text-sm font-bold transition-colors cursor-pointer border-b-2 
                 ${activeTab === 'reviews' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
             >
-              Customer Reviews (122)
+              {t('product_reviews_tab')}
             </button>
           </div>
           
@@ -349,8 +376,8 @@ const Product = () => {
           <div className='p-8 text-sm text-slate-500 leading-relaxed bg-white border border-slate-100 rounded-b-2xl rounded-tr-2xl shadow-sm mt-0'>
             {activeTab === 'description' ? (
               <div className="flex flex-col gap-4">
-                <p>An e-commerce website is an online platform that facilitates the buying and selling of products or services over the internet. It serves as a virtual marketplace where businesses and individuals can showcase their products, interact with customers, and conduct transactions without the need for a physical presence. E-commerce websites have gained immense popularity due to their convenience, accessibility, and the global reach they offer.</p>
-                <p>E-commerce websites typically display products or services along with detailed descriptions, images, prices, and any available variations (e.g., sizes, colors). Each product usually has its own dedicated page with relevant information to help customers make informed purchasing decisions.</p>
+                <p>{t('product_description_1')}</p>
+                <p>{t('product_description_2')}</p>
               </div>
             ) : (
               <div className="flex flex-col gap-6">
@@ -364,12 +391,12 @@ const Product = () => {
                       <img src={assets.star_icon} alt="star" className="w-3.5 h-3.5"/>
                       <img src={assets.star_icon} alt="star" className="w-3.5 h-3.5"/>
                     </div>
-                    <span className="font-bold text-slate-800 text-xs ml-2">Alex Johnson</span>
-                    <span className="text-slate-400 text-xs">&bull; 2 days ago</span>
+                    <span className="font-bold text-slate-800 text-xs ml-2">{t('product_reviews_sample_name')}</span>
+                    <span className="text-slate-400 text-xs">&bull; {t('product_reviews_sample_time')}</span>
                   </div>
-                  <p className="text-slate-600">The quality of the material is absolutely outstanding. Fits perfectly and feels very premium. Highly recommend it to anyone looking for a solid wardrobe staple.</p>
+                  <p className="text-slate-600">{t('product_reviews_sample_text')}</p>
                 </div>
-                <p className="text-center text-indigo-600 font-semibold cursor-pointer hover:underline">Load more reviews...</p>
+                <p className="text-center text-indigo-600 font-semibold cursor-pointer hover:underline">{t('product_load_more_reviews')}</p>
               </div>
             )}
           </div>
@@ -414,8 +441,8 @@ const Product = () => {
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
               </button>
               <div className="w-px h-6 bg-white/20 mx-1"></div>
-              <button onClick={handleResetZoom} className="px-4 h-10 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-semibold transition-colors" title="Reset">
-                Reset
+              <button onClick={handleResetZoom} className="px-4 h-10 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-semibold transition-colors" title={t('product_reset')}>
+                {t('product_reset')}
               </button>
             </div>
 

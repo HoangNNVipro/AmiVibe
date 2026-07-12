@@ -1,5 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation, Trans } from 'react-i18next'
 import { backendUrl } from '../App'
 import { toast } from 'react-toastify'
 import { currency } from '../App'
@@ -107,6 +108,7 @@ const FilterDropdown = ({ value, onChange, options }) => {
 };
 
 const List = ({ token}) => {
+  const { t } = useTranslation()
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -251,7 +253,7 @@ const List = ({ token}) => {
     setFilterSubCategory('All');
     setFilterInStock('All');
     setFilterBestseller('All');
-    toast.info("Filters reset successfully");
+    toast.info(t('list_filters_reset_success'));
   };
 
   return (
@@ -261,8 +263,8 @@ const List = ({ token}) => {
         {/* Title Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Products</h1>
-            <p className="text-sm text-slate-500 mt-1">Manage, curate, and filter your fashion marketplace inventory catalog.</p>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('list_products_title')}</h1>
+            <p className="text-sm text-slate-500 mt-1">{t('list_products_subtitle')}</p>
           </div>
           <button 
             onClick={fetchList} 
@@ -280,7 +282,7 @@ const List = ({ token}) => {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
               </svg>
             )}
-            Refresh List
+            {t('list_refresh_list')}
           </button>
         </div>
 
@@ -294,7 +296,7 @@ const List = ({ token}) => {
               </svg>
             </div>
             <div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Products</p>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('list_total_products')}</p>
               <h4 className="text-lg font-bold text-slate-900 mt-0.5">{metrics.total}</h4>
             </div>
           </div>
@@ -307,7 +309,7 @@ const List = ({ token}) => {
               </svg>
             </div>
             <div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">In Stock</p>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('list_in_stock')}</p>
               <h4 className="text-lg font-bold text-slate-900 mt-0.5">{metrics.inStockCount}</h4>
             </div>
           </div>
@@ -320,7 +322,7 @@ const List = ({ token}) => {
               </svg>
             </div>
             <div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Out of Stock</p>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('list_out_of_stock')}</p>
               <h4 className="text-lg font-bold text-slate-900 mt-0.5">{metrics.outOfStockCount}</h4>
             </div>
           </div>
@@ -333,7 +335,7 @@ const List = ({ token}) => {
               </svg>
             </div>
             <div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Bestsellers</p>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('list_bestsellers')}</p>
               <h4 className="text-lg font-bold text-slate-900 mt-0.5">{metrics.bestsellersCount}</h4>
             </div>
           </div>
@@ -352,7 +354,7 @@ const List = ({ token}) => {
               </span>
               <input 
                 type="text" 
-                placeholder="Search name..."
+                placeholder={t('list_search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-850 bg-slate-50/50"
@@ -392,13 +394,17 @@ const List = ({ token}) => {
           {(searchQuery || filterCategory !== 'All' || filterSubCategory !== 'All' || filterInStock !== 'All' || filterBestseller !== 'All') && (
             <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
               <span className="text-slate-400">
-                Found <b className="text-slate-700">{filteredProducts.length}</b> matching items in database.
+                <Trans
+                  i18nKey="list_found_matching_items"
+                  values={{ count: filteredProducts.length }}
+                  components={{ b: <b className="text-slate-700" /> }}
+                />
               </span>
               <button 
                 onClick={handleResetFilters}
                 className="text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1.5 transition-colors"
               >
-                Clear all active filters &times;
+                {t('list_clear_filters')} &times;
               </button>
             </div>
           )}
@@ -411,13 +417,13 @@ const List = ({ token}) => {
               <svg className="w-16 h-16 stroke-1 mb-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
-              <p className="text-sm font-semibold text-slate-600">No products matching filters found</p>
-              <p className="text-xs text-slate-400 mt-1">Try resetting filters or checking spelling check.</p>
+              <p className="text-sm font-semibold text-slate-600">{t('list_no_products_found')}</p>
+              <p className="text-xs text-slate-400 mt-1">{t('list_no_products_hint')}</p>
               <button 
                 onClick={handleResetFilters}
                 className="mt-4 px-4 py-2 bg-slate-900 hover:bg-slate-850 text-white font-medium text-xs rounded-lg transition-all"
               >
-                Reset Filters
+                {t('list_reset_filters')}
               </button>
             </div>
           ) : (
@@ -425,14 +431,14 @@ const List = ({ token}) => {
               <table className="w-full text-left border-separate border-spacing-y-3">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    <th className="py-4 px-3 w-20">Product</th>
-                    <th className="py-4 px-3 w-auto">Name & SubCategory</th>
-                    <th className="py-4 px-3 w-24">Category</th>
-                    <th className="py-4 px-3 w-20">Price</th>
-                    <th className="py-4 px-3 w-24">Sizes</th>
-                    <th className="py-4 px-3 w-24 text-center">Bestseller</th>
-                    <th className="py-4 px-3 w-28 text-center">Stock Status</th>
-                    <th className="py-4 px-3 text-right w-28">Actions</th>
+                    <th className="py-4 px-3 w-20">{t('list_product')}</th>
+                    <th className="py-4 px-3 w-auto">{t('list_name_subcategory')}</th>
+                    <th className="py-4 px-3 w-24">{t('list_category')}</th>
+                    <th className="py-4 px-3 w-20">{t('list_price')}</th>
+                    <th className="py-4 px-3 w-24">{t('list_sizes')}</th>
+                    <th className="py-4 px-3 w-24 text-center">{t('list_bestseller')}</th>
+                    <th className="py-4 px-3 w-28 text-center">{t('list_stock_status')}</th>
+                    <th className="py-4 px-3 text-right w-28">{t('list_actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 text-sm">
@@ -507,7 +513,7 @@ const List = ({ token}) => {
                           title="Click to toggle stock status instantly"
                         >
                           <span className={`w-1.5 h-1.5 rounded-full ${item.inStock ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'}`}></span>
-                          {item.inStock ? 'In Stock' : 'Out of Stock'}
+                          {item.inStock ? t('list_in_stock') : t('list_out_of_stock')}
                         </button>
                       </td>
 
@@ -570,7 +576,7 @@ const List = ({ token}) => {
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   className="px-3 py-1.5 border border-slate-200 bg-white hover:bg-slate-50 rounded-lg text-slate-600 font-bold transition-all disabled:opacity-40 disabled:hover:bg-white cursor-pointer"
                 >
-                  Prev
+                  {t('list_prev')}
                 </button>
                 {Array.from({ length: totalPages }).map((_, idx) => (
                   <button
@@ -588,7 +594,7 @@ const List = ({ token}) => {
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   className="px-3 py-1.5 border border-slate-200 bg-white hover:bg-slate-50 rounded-lg text-slate-600 font-bold transition-all disabled:opacity-40 disabled:hover:bg-white cursor-pointer"
                 >
-                  Next
+                  {t('list_next')}
                 </button>
               </div>
             </div>
@@ -687,6 +693,7 @@ const List = ({ token}) => {
 /* SUB-COMPONENT: ProductPreviewSection (Dựa trên cấu trúc của Product.jsx)  */
 /* ========================================================================= */
 const ProductPreviewSection = ({ product, currency }) => {
+  const { t } = useTranslation()
   const [activeImage, setActiveImage] = useState(product.image ? product.image[0] : '');
   const [selectedSize, setSelectedSize] = useState('');
 
@@ -705,7 +712,7 @@ const ProductPreviewSection = ({ product, currency }) => {
         {product.bestseller && (
           <>
             <span>&bull;</span>
-            <span className="text-amber-500 font-bold">Bestseller</span>
+            <span className="text-amber-500 font-bold">{t('list_bestseller')}</span>
           </>
         )}
       </div>
@@ -747,7 +754,7 @@ const ProductPreviewSection = ({ product, currency }) => {
           <div className="flex items-center gap-3 mt-4">
             <span className="text-2xl font-extrabold text-slate-900">{currency}{product.price}</span>
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${product.inStock ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
-              {product.inStock ? 'In Stock' : 'Out Of Stock'}
+              {product.inStock ? t('list_in_stock') : t('list_out_of_stock')}
             </span>
           </div>
 
@@ -772,19 +779,19 @@ const ProductPreviewSection = ({ product, currency }) => {
           {/* Detailed specifications */}
           <div className="mt-5 border-t border-slate-100 pt-4 grid grid-cols-2 gap-y-3 gap-x-2 text-[11px]">
             <div>
-              <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[9px]">Apparel Style</span>
+              <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[9px]">{t('add_styles')}</span>
               <span className="text-slate-700 font-bold">{product.styles ? product.styles.join(', ') : 'N/A'}</span>
             </div>
             <div>
-              <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[9px]">Material</span>
+              <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[9px]">{t('add_materials')}</span>
               <span className="text-slate-700 font-bold">{product.materials ? product.materials.join(', ') : 'N/A'}</span>
             </div>
             <div>
-              <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[9px]">Target Seasons</span>
+              <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[9px]">{t('add_seasons')}</span>
               <span className="text-slate-700 font-bold">{product.seasons ? product.seasons.join(', ') : 'N/A'}</span>
             </div>
             <div>
-              <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[9px]">Fit Type Cut</span>
+              <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[9px]">{t('add_fit_style')}</span>
               <span className="text-slate-700 font-bold">{product.fit || 'N/A'}</span>
             </div>
           </div>
@@ -798,6 +805,7 @@ const ProductPreviewSection = ({ product, currency }) => {
 /* SUB-COMPONENT: EditProductFormSection (Dựa trên biểu mẫu Add.jsx)         */
 /* ========================================================================= */
 const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
+  const { t } = useTranslation()
   const [name, setName] = useState(product.name || "");
   const [description, setDescription] = useState(product.description || "");
   
@@ -877,14 +885,14 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
     e.preventDefault();
 
     const localErrors = {};
-    if (images.length === 0) localErrors.images = "Please upload at least 1 image.";
-    if (sizes.length === 0) localErrors.sizes = "Please select at least 1 size.";
-    if (seasons.length === 0) localErrors.seasons = "Please select at least 1 season.";
-    if (styles.length === 0) localErrors.styles = "Please select at least 1 style.";
-    if (colors.length === 0) localErrors.colors = "Please select at least 1 color.";
-    if (materials.length === 0) localErrors.materials = "Please select at least 1 material.";
-    if (!fit) localErrors.fit = "Please specify a fit profile.";
-    if (occasions.length === 0) localErrors.occasions = "Please select at least 1 occasion.";
+    if (images.length === 0) localErrors.images = t('add_validation_image_required');
+    if (sizes.length === 0) localErrors.sizes = t('add_validation_size_required');
+    if (seasons.length === 0) localErrors.seasons = t('add_validation_season_required');
+    if (styles.length === 0) localErrors.styles = t('add_validation_style_required');
+    if (colors.length === 0) localErrors.colors = t('add_validation_color_required');
+    if (materials.length === 0) localErrors.materials = t('add_validation_material_required');
+    if (!fit) localErrors.fit = t('add_validation_fit_required');
+    if (occasions.length === 0) localErrors.occasions = t('add_validation_occasion_required');
 
     if (Object.keys(localErrors).length > 0) {
       setErrors(localErrors);
@@ -959,7 +967,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
       {/* Gallery images Section */}
       <div id="edit-section-images" className={`p-4 rounded-xl border transition-all duration-300 ${errors.images ? 'bg-rose-50/40 border-rose-200' : 'border-slate-100 bg-slate-50/30'}`}>
         <p className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
-          Product Images Portfolio <span className="text-rose-500">*</span>
+          {t('add_upload_images')} <span className="text-rose-500">*</span>
         </p>
         {errors.images && <p className="text-xs text-rose-500 font-semibold mb-2">{errors.images}</p>}
         
@@ -986,7 +994,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
-              <span className="text-[9px] font-bold uppercase tracking-wider mt-1">Upload</span>
+              <span className="text-[9px] font-bold uppercase tracking-wider mt-1">{t('add_add_image')}</span>
             </div>
             <input 
               onChange={handleImageUpload}
@@ -1003,7 +1011,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
       {/* Name and Price Inputs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2">
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Product Name</label>
+          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_product_name')}</label>
           <input 
             type="text" 
             value={name}
@@ -1013,7 +1021,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
           />
         </div>
         <div>
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Unit Price ($)</label>
+          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_product_price')}</label>
           <input 
             type="number" 
             value={price}
@@ -1026,7 +1034,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
       </div>
 
       <div>
-        <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Description Summary</label>
+        <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_product_description')}</label>
         <textarea 
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -1038,7 +1046,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
       {/* Categories Selectors */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div ref={categoryRef} className="relative">
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Main Category</label>
+          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_product_category')}</label>
           <div 
             onClick={() => setIsCategoryOpen(!isCategoryOpen)}
             className="flex items-center justify-between w-full px-3.5 py-2 border border-slate-200 rounded-lg text-xs bg-white cursor-pointer hover:border-slate-350 transition-all shadow-sm"
@@ -1064,7 +1072,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
         </div>
 
         <div ref={subCategoryRef} className="relative">
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Sub Category</label>
+          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_sub_category')}</label>
           <div 
             onClick={() => setIsSubCategoryOpen(!isSubCategoryOpen)}
             className="flex items-center justify-between w-full px-3.5 py-2 border border-slate-200 rounded-lg text-xs bg-white cursor-pointer hover:border-slate-350 transition-all shadow-sm"
@@ -1095,7 +1103,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
         
         {/* Sizes */}
         <div id="edit-section-sizes" className={`p-3 rounded-xl border ${errors.sizes ? 'bg-rose-50/40 border-rose-200' : 'border-slate-100 bg-slate-50/20'}`}>
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Sizes Options</label>
+          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_product_sizes')}</label>
           <div className="flex flex-wrap gap-1.5 mt-1">
             {["S", "M", "L", "XL", "XXL"].map(size => (
               <div
@@ -1111,7 +1119,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
 
         {/* Seasons */}
         <div id="edit-section-seasons" className={`p-3 rounded-xl border ${errors.seasons ? 'bg-rose-50/40 border-rose-200' : 'border-slate-100 bg-slate-50/20'}`}>
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Target Seasons</label>
+          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_seasons')}</label>
           <div className="flex flex-wrap gap-1.5 mt-1">
             {seasonOptions.map(season => (
               <div
@@ -1127,7 +1135,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
 
         {/* Styles */}
         <div id="edit-section-styles" className={`p-3 rounded-xl border ${errors.styles ? 'bg-rose-50/40 border-rose-200' : 'border-slate-100 bg-slate-50/20'}`}>
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Apparel Styles</label>
+          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_styles')}</label>
           <div className="flex flex-wrap gap-1.5 mt-1">
             {styleOptions.map(style => (
               <div
@@ -1143,7 +1151,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
 
         {/* Colors selector */}
         <div id="edit-section-colors" className={`p-3 rounded-xl border ${errors.colors ? 'bg-rose-50/40 border-rose-200' : 'border-slate-100 bg-slate-50/20'}`}>
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Fabric Colors</label>
+          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_colors')}</label>
           <div className="flex flex-wrap gap-1.5 mt-1">
             {colorOptions.map(color => {
               const selected = colors.includes(color);
@@ -1166,7 +1174,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
 
         {/* Materials */}
         <div id="edit-section-materials" className={`p-3 rounded-xl border ${errors.materials ? 'bg-rose-50/40 border-rose-200' : 'border-slate-100 bg-slate-50/20'}`}>
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Construct Materials</label>
+          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_materials')}</label>
           <div className="flex flex-wrap gap-1.5 mt-1">
             {materialOptions.map(mat => (
               <div
@@ -1182,7 +1190,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
 
         {/* Occasions */}
         <div id="edit-section-occasions" className={`p-3 rounded-xl border ${errors.occasions ? 'bg-rose-50/40 border-rose-200' : 'border-slate-100 bg-slate-50/20'}`}>
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Suitable Occasions</label>
+          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_occasions')}</label>
           <div className="flex flex-wrap gap-1.5 mt-1">
             {occasionOptions.map(occ => (
               <div
@@ -1198,7 +1206,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
 
         {/* Fit Profiles single option selector */}
         <div id="edit-section-fit" className={`p-3 sm:col-span-2 rounded-xl border ${errors.fit ? 'bg-rose-50/40 border-rose-200' : 'border-slate-100 bg-slate-50/20'}`}>
-          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">Fit Profile Cut <span className="text-rose-500">*</span></label>
+          <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">{t('add_fit_style')} <span className="text-rose-500">*</span></label>
           {errors.fit && <p className="text-xs text-rose-500 font-semibold mb-2">{errors.fit}</p>}
           <div className="flex flex-wrap gap-1.5 mt-1">
             {fitOptions.map(fitOpt => (
@@ -1241,7 +1249,7 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
             className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-800 cursor-pointer accent-slate-900"
           />
           <label htmlFor="edit-bestseller" className="text-xs font-semibold text-slate-700 cursor-pointer select-none">
-            Promote to bestseller collection highlight
+            {t('add_to_bestseller')}
           </label>
         </div>
       </div>
@@ -1253,13 +1261,13 @@ const EditProductFormSection = ({ product, token, onSuccess, onClose }) => {
           onClick={onClose}
           className="px-5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors cursor-pointer"
         >
-          Cancel
+          {t('user_cancel')}
         </button>
         <button
           type="submit"
           className="px-6 py-2 text-xs font-semibold text-white bg-slate-950 hover:bg-slate-850 active:scale-95 rounded-lg shadow-md transition-all cursor-pointer"
         >
-          Save Changes
+          {t('user_save_changes')}
         </button>
       </div>
     </form>

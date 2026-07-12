@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation, Trans } from "react-i18next";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { backendUrl, currency } from "../App";
@@ -6,6 +7,7 @@ import { assets } from "../assets/assets";
 
 
 const Orders = ({ token }) => {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false); 
   
@@ -47,11 +49,11 @@ const Orders = ({ token }) => {
         const fetchedOrders = response.data.orders || [];
         setOrders([...fetchedOrders].reverse());
       } else {
-        toast.error(response.data.message || "Failed to fetch order list.");
+        toast.error(response.data.message || t('orders_fetch_failed'));
       }
     } catch (error) {
       console.error("API Connection Error:", error);
-      toast.error(error.message || "Server connection error");
+      toast.error(error.message || t('orders_server_connection_error'));
     } finally {
       setLoading(false);
     }
@@ -68,14 +70,14 @@ const Orders = ({ token }) => {
         { headers: { token } }
       );
       if (response.data.success) {
-        toast.success("Status updated successfully!");
+        toast.success(t('orders_status_updated_success'));
         await fetchAllOrders();
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
       console.error("Error updating order status:", error);
-      toast.error(error.response?.data?.message || error.message || "Update operation failed");
+      toast.error(error.response?.data?.message || error.message || t('orders_update_failed'));
     }
   };
 
@@ -140,40 +142,36 @@ const Orders = ({ token }) => {
     return result;
   }, [orders, searchTerm, statusFilter, paymentFilter, sortBy]);
 
-  // Display text for processing status filter
-  const statusFilterOptions = {
-    "All": "Status: All",
-    "Order Placed": "Order Placed",
-    "Packing": "Packing",
-    "Shipped": "Shipped",
-    "Out of delivery": "Out of delivery",
-    "Delivered": "Delivered"
-  };
+  const statusFilterOptions = useMemo(() => ({
+    "All": t('orders_status_all'),
+    "Order Placed": t('orders_status_order_placed'),
+    "Packing": t('orders_status_packing'),
+    "Shipped": t('orders_status_shipped'),
+    "Out of delivery": t('orders_status_out_of_delivery'),
+    "Delivered": t('orders_status_delivered')
+  }), [t]);
 
-  // Display text for changing order status
-  const orderStatusLabels = {
-    "Order Placed": "Order Placed",
-    "Packing": "Packing",
-    "Shipped": "Shipped",
-    "Out of delivery": "Out for delivery",
-    "Delivered": "Delivered"
-  };
+  const orderStatusLabels = useMemo(() => ({
+    "Order Placed": t('orders_status_order_placed'),
+    "Packing": t('orders_status_packing'),
+    "Shipped": t('orders_status_shipped'),
+    "Out of delivery": t('orders_status_out_of_delivery'),
+    "Delivered": t('orders_status_delivered')
+  }), [t]);
 
-  // Display text for payment filter
-  const paymentFilterOptions = {
-    "All": "Payment: All",
-    "Paid": "Paid Only",
-    "Pending": "Pending Only",
-    "COD": "Cash on Delivery (COD)"
-  };
+  const paymentFilterOptions = useMemo(() => ({
+    "All": t('orders_payment_all'),
+    "Paid": t('orders_payment_paid'),
+    "Pending": t('orders_payment_pending'),
+    "COD": t('orders_payment_cod')
+  }), [t]);
 
-  // Sorting order options
-  const sortByOptions = {
-    "date-desc": "Newest First",
-    "date-asc": "Oldest First",
-    "amount-desc": "Highest Amount",
-    "amount-asc": "Lowest Amount"
-  };
+  const sortByOptions = useMemo(() => ({
+    "date-desc": t('orders_sort_newest'),
+    "date-asc": t('orders_sort_oldest'),
+    "amount-desc": t('orders_sort_highest_amount'),
+    "amount-asc": t('orders_sort_lowest_amount')
+  }), [t]);
 
   // Order status badge colors
   const getStatusStyle = (status) => {
@@ -203,9 +201,9 @@ const Orders = ({ token }) => {
             <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            Order Management
+            {t('orders_management_title')}
           </h1>
-          <p className="text-slate-500 text-sm mt-1">Manage shipping statuses, actual revenue, and cash flow.</p>
+          <p className="text-slate-500 text-sm mt-1">{t('orders_management_subtitle')}</p>
         </div>
         
         {/* RELOAD DATA BUTTON */}
@@ -225,7 +223,7 @@ const Orders = ({ token }) => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
             </svg>
           )}
-          Refresh List
+          {t('orders_refresh_list')}
         </button>
       </div>
 
@@ -239,7 +237,7 @@ const Orders = ({ token }) => {
             </svg>
           </div>
           <div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Orders</p>
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('orders_total_orders')}</p>
             <h4 className="text-lg font-bold text-slate-900 mt-0.5">{stats.total}</h4>
           </div>
         </div>
@@ -252,7 +250,7 @@ const Orders = ({ token }) => {
             </svg>
           </div>
           <div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Revenue</p>
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('orders_revenue')}</p>
             <h4 className="text-lg font-bold text-slate-900 mt-0.5">
               {stats.revenue.toLocaleString()}<span className="text-xs ml-0.5 text-slate-500">{currency}</span>
             </h4>
@@ -267,7 +265,7 @@ const Orders = ({ token }) => {
             </svg>
           </div>
           <div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pending Payment</p>
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('orders_pending_payment')}</p>
             <h4 className="text-lg font-bold text-slate-900 mt-0.5">{stats.pendingPayment}</h4>
           </div>
         </div>
@@ -280,7 +278,7 @@ const Orders = ({ token }) => {
             </svg>
           </div>
           <div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Delivered</p>
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('orders_delivered')}</p>
             <h4 className="text-lg font-bold text-slate-900 mt-0.5">{stats.delivered}</h4>
           </div>
         </div>
@@ -294,7 +292,7 @@ const Orders = ({ token }) => {
           <div className="relative md:col-span-2">
             <input 
               type="text" 
-              placeholder="Search by customer name, phone, order ID, item name..."
+              placeholder={t('orders_search_placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-sm outline-none transition"
@@ -414,12 +412,16 @@ const Orders = ({ token }) => {
         {/* Results Counter and Sorter */}
         <div className="flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500 gap-2">
           <div>
-            Showing <span className="font-bold text-slate-800">{filteredAndSortedOrders.length}</span> out of <span className="font-bold text-slate-800">{orders.length}</span> orders
+            <Trans
+              i18nKey="orders_results_count"
+              values={{ shown: filteredAndSortedOrders.length, total: orders.length }}
+              components={{ b: <span className="font-bold text-slate-800" /> }}
+            />
           </div>
           
           {/* CUSTOM DROPDOWN: Sort Orders */}
           <div className="flex items-center gap-2 relative custom-dropdown-container">
-            <span className="font-medium text-slate-400">Sort by:</span>
+            <span className="font-medium text-slate-400">{t('orders_sort_by')}</span>
             <button
               type="button"
               onClick={() => setActiveDropdown(activeDropdown === "sortBy" ? null : "sortBy")}
@@ -465,7 +467,7 @@ const Orders = ({ token }) => {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border border-slate-100 shadow-sm">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-slate-500 text-sm font-medium">Loading orders data...</p>
+          <p className="mt-4 text-slate-500 text-sm font-medium">{t('orders_loading')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -488,18 +490,20 @@ const Orders = ({ token }) => {
                   </span>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-extrabold text-slate-800 text-sm">Order ID #{order._id.slice(-8).toUpperCase()}</span>
+                      <span className="font-extrabold text-slate-800 text-sm">{t('orders_order_id', { id: order._id.slice(-8).toUpperCase() })}</span>
                       <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">({order._id})</span>
                     </div>
                     <span className="text-xs text-slate-400 block mt-0.5">
-                      Order Time: {new Date(order.date).toLocaleDateString()} {new Date(order.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      {t('orders_order_time', {
+                        time: `${new Date(order.date).toLocaleDateString()} ${new Date(order.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+                      })}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusStyle(order.status)}`}>
-                    {order.status}
+                    {orderStatusLabels[order.status] || order.status}
                   </span>
                 </div>
               </div>
@@ -509,7 +513,7 @@ const Orders = ({ token }) => {
                 
                 {/* 1. Product Details */}
                 <div className="lg:col-span-5 space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Product Details ({order.items.length})</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">{t('orders_product_details', { count: order.items.length })}</h4>
                   <div className="divide-y divide-slate-100 max-h-56 overflow-y-auto pr-2 custom-scrollbar">
                     {order.items.map((item, index) => (
                       <div key={item._id || index} className="py-2.5 first:pt-0 last:pb-0 flex gap-3">
@@ -543,7 +547,7 @@ const Orders = ({ token }) => {
 
                 {/* 2. Shipping Information */}
                 <div className="lg:col-span-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100/70 space-y-2.5 text-xs sm:text-sm">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Shipping Information</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">{t('orders_shipping_information')}</h4>
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-7 h-7 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-[11px]">
                       {((order.address?.firstName?.charAt(0) || "U") + (order.address?.lastName?.charAt(0) || "C")).toUpperCase()}
@@ -582,10 +586,10 @@ const Orders = ({ token }) => {
 
                 {/* 3. Payment & Status Update */}
                 <div className="lg:col-span-3 space-y-4">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Payment & Status</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">{t('orders_payment_status')}</h4>
                   
                   <div>
-                    <span className="text-xs text-slate-500 block">Total Amount:</span>
+                    <span className="text-xs text-slate-500 block">{t('orders_total_amount')}</span>
                     <span className="text-xl font-extrabold text-slate-900 mt-0.5 block">
                       {currency}{order.amount.toLocaleString()}
                     </span>
@@ -593,18 +597,18 @@ const Orders = ({ token }) => {
 
                   <div className="space-y-2 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-500 font-medium">Method:</span>
+                      <span className="text-slate-500 font-medium">{t('orders_method')}</span>
                       <span className="font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md text-[11px]">{order.paymentMethod}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-500 font-medium">Payment:</span>
+                      <span className="text-slate-500 font-medium">{t('orders_payment')}</span>
                       {order.payment ? (
                         <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full text-[10px]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Completed
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {t('orders_completed')}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full text-[10px]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pending / COD
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> {t('orders_pending_cod')}
                         </span>
                       )}
                     </div>
@@ -613,7 +617,7 @@ const Orders = ({ token }) => {
                   {/* CUSTOM DROPDOWN: Quick Status Update */}
                   <div className="pt-3 border-t border-slate-100 relative custom-dropdown-container">
                     <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                      Update Status
+                      {t('orders_update_status')}
                     </label>
                     <button
                       type="button"
@@ -670,13 +674,13 @@ const Orders = ({ token }) => {
               <svg className="w-14 h-14 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <h3 className="font-bold text-slate-800 text-lg">No orders found</h3>
-              <p className="text-slate-400 text-sm mt-1 max-w-sm">No results match your filters or search keyword.</p>
+              <h3 className="font-bold text-slate-800 text-lg">{t('orders_no_orders_found')}</h3>
+              <p className="text-slate-400 text-sm mt-1 max-w-sm">{t('orders_no_results_match')}</p>
               <button 
                 onClick={() => { setSearchTerm(""); setStatusFilter("All"); setPaymentFilter("All"); }}
                 className="mt-4 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl text-xs font-bold transition shadow-sm"
               >
-                Reset Filters
+                {t('orders_reset_filters')}
               </button>
             </div>
           )}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -14,8 +15,40 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { backendUrl } from '../App';
 
+const getOrderStatusLabel = (status, t) => {
+  switch (status) {
+    case 'Order Placed':
+      return t('orders_status_order_placed');
+    case 'Packing':
+      return t('orders_status_packing');
+    case 'Shipped':
+      return t('orders_status_shipped');
+    case 'Out of delivery':
+      return t('orders_status_out_of_delivery');
+    case 'Delivered':
+      return t('orders_status_delivered');
+    default:
+      return status;
+  }
+};
+
+const getPieStatusLabel = (name, t) => {
+  switch (name) {
+    case 'Placed':
+      return t('orders_status_order_placed');
+    case 'Packing':
+      return t('orders_status_packing');
+    case 'Shipped':
+      return t('orders_status_shipped');
+    case 'Delivered':
+      return t('orders_status_delivered');
+    default:
+      return name;
+  }
+};
 
 const Dashboard = ({ token }) => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -289,9 +322,9 @@ const Dashboard = ({ token }) => {
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
             <Activity className="text-indigo-600 w-8 h-8 animate-pulse" />
-            Fashion Command Center
+            {t('dashboard_title')}
           </h1>
-          <p className="text-slate-500 text-sm mt-1">Real-time shopping behavior, style preferences, and warehouse fulfillment metrics.</p>
+          <p className="text-slate-500 text-sm mt-1">{t('dashboard_subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <button 
@@ -300,7 +333,7 @@ const Dashboard = ({ token }) => {
             className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 bg-white hover:bg-slate-50 rounded-xl text-slate-600 text-xs font-semibold shadow-xs transition active:scale-95 cursor-pointer disabled:opacity-60"
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-            Sync System
+            {t('dashboard_sync_system')}
           </button>
         </div>
       </div>
@@ -308,17 +341,17 @@ const Dashboard = ({ token }) => {
       {/* DASHBOARD TAB NAVIGATION */}
       <div className="flex border-b border-slate-200 mb-8 overflow-x-auto whitespace-nowrap scrollbar-none gap-2">
         {[
-          { id: "overview", label: "Overview Metrics" },
-          { id: "products", label: "Style & Product Performance" },
-          { id: "orders", label: "Transactional Management" },
-          { id: "customers", label: "Customer Segments" }
+          { id: "overview", labelKey: "dashboard_tab_overview_metrics" },
+          { id: "products", labelKey: "dashboard_tab_style_performance" },
+          { id: "orders", labelKey: "dashboard_tab_transactional_management" },
+          { id: "customers", labelKey: "dashboard_tab_customer_segments" }
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`pb-3.5 px-4 font-bold text-sm transition-all relative cursor-pointer ${activeTab === tab.id ? 'text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
           >
-            {tab.label}
+            {t(tab.labelKey)}
             {activeTab === tab.id && (
               <motion.div layoutId="activeTabGlow" className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />
             )}
@@ -330,7 +363,7 @@ const Dashboard = ({ token }) => {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-slate-150/70 shadow-xs">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
-            <p className="mt-4 text-slate-500 text-sm font-medium">Querying data from API...</p>
+            <p className="mt-4 text-slate-500 text-sm font-medium">{t('dashboard_querying_data')}</p>
           </div>
         ) : (
           <>
@@ -342,74 +375,74 @@ const Dashboard = ({ token }) => {
                   
                   {/* FINANCIAL */}
                   <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-xs space-y-1">
-                    <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Total Revenue</p>
+                    <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">{t('dashboard_total_revenue')}</p>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900">${stats.totalRev.toLocaleString()}</h3>
                     <div className="text-[10px] font-semibold text-slate-400 mt-2 flex items-center justify-between">
-                      <span>AOV: ${stats.avgOrderValue}</span>
+                      <span>{t('dashboard_aov', { amount: stats.avgOrderValue })}</span>
                     </div>
                   </div>
 
                   <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-xs space-y-1">
-                    <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Monthly Revenue</p>
+                    <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">{t('dashboard_monthly_revenue')}</p>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900">${stats.monthlyRev.toLocaleString()}</h3>
                     <div className="text-[10px] font-semibold text-slate-400 mt-2 flex items-center justify-between">
-                      <span>In the last 30 days</span>
+                      <span>{t('dashboard_last_30_days')}</span>
                     </div>
                   </div>
 
                   {/* OPERATIONS */}
                   <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-xs space-y-1">
-                    <p className="text-[10px] font-bold text-amber-500 uppercase tracking-widest">Orders Delivered</p>
+                    <p className="text-[10px] font-bold text-amber-500 uppercase tracking-widest">{t('dashboard_orders_delivered')}</p>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900">{stats.completedOrd} / {stats.totalOrd}</h3>
                     <div className="text-[10px] font-semibold text-slate-400 mt-2 flex items-center justify-between">
-                      <span>Delivery Pipeline</span>
-                      <span className="text-indigo-600 font-bold">Pending: {stats.pendingOrd}</span>
+                      <span>{t('dashboard_delivery_pipeline')}</span>
+                      <span className="text-indigo-600 font-bold">{t('dashboard_pending', { pending: stats.pendingOrd })}</span>
                     </div>
                   </div>
 
                   <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-xs space-y-1">
-                    <p className="text-[10px] font-bold text-amber-500 uppercase tracking-widest">Conversion Rate</p>
+                    <p className="text-[10px] font-bold text-amber-500 uppercase tracking-widest">{t('dashboard_conversion_rate')}</p>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900">{stats.conversionRate}%</h3>
                     <div className="text-[10px] font-semibold text-slate-400 mt-2 flex items-center justify-between">
-                      <span>Success Checkouts</span>
+                      <span>{t('dashboard_success_checkouts')}</span>
                     </div>
                   </div>
 
                   {/* STOCK HEALTH */}
                   <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-xs space-y-1">
-                    <p className="text-[10px] font-bold text-purple-500 uppercase tracking-widest">Total Products</p>
+                    <p className="text-[10px] font-bold text-purple-500 uppercase tracking-widest">{t('dashboard_total_products')}</p>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900">{stats.totalProd}</h3>
                     <div className="text-[10px] font-semibold text-slate-400 mt-2 flex items-center justify-between">
-                      <span>In Stock: {stats.inStockProd}</span>
-                      <span className="text-rose-600 font-bold">Out: {stats.outOfStockProd}</span>
+                      <span>{t('dashboard_in_stock_count', { count: stats.inStockProd })}</span>
+                      <span className="text-rose-600 font-bold">{t('dashboard_out_count', { count: stats.outOfStockProd })}</span>
                     </div>
                   </div>
 
                   <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-xs space-y-1">
-                    <p className="text-[10px] font-bold text-purple-500 uppercase tracking-widest">Inventory Health</p>
+                    <p className="text-[10px] font-bold text-purple-500 uppercase tracking-widest">{t('dashboard_inventory_health')}</p>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900">
                       {stats.totalProd > 0 ? ((stats.inStockProd / stats.totalProd) * 100).toFixed(0) : 0}%
                     </h3>
                     <div className="text-[10px] font-semibold text-slate-400 mt-2 flex items-center justify-between">
-                      <span>In-stock Rate</span>
+                      <span>{t('dashboard_in_stock_rate')}</span>
                     </div>
                   </div>
 
                   {/* CUSTOMERS */}
                   <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-xs space-y-1">
-                    <p className="text-[10px] font-bold text-teal-500 uppercase tracking-widest">Total Customers</p>
+                    <p className="text-[10px] font-bold text-teal-500 uppercase tracking-widest">{t('dashboard_total_customers')}</p>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900">{stats.totalCust}</h3>
                     <div className="text-[10px] font-semibold text-slate-400 mt-2 flex items-center justify-between">
-                      <span>Registered System</span>
+                      <span>{t('dashboard_registered_system')}</span>
                     </div>
                   </div>
 
                   <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-xs space-y-1">
-                    <p className="text-[10px] font-bold text-teal-500 uppercase tracking-widest">Active Accounts</p>
+                    <p className="text-[10px] font-bold text-teal-500 uppercase tracking-widest">{t('dashboard_active_accounts')}</p>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900">{stats.activeCust}</h3>
                     <div className="text-[10px] font-semibold text-slate-400 mt-2 flex items-center justify-between">
-                      <span>Active Status</span>
-                      <span className="text-rose-500 font-bold">Suspended: {stats.totalCust - stats.activeCust}</span>
+                      <span>{t('dashboard_active_status')}</span>
+                      <span className="text-rose-500 font-bold">{t('dashboard_suspended_count', { count: stats.totalCust - stats.activeCust })}</span>
                     </div>
                   </div>
 
@@ -422,15 +455,15 @@ const Dashboard = ({ token }) => {
                   <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-100 shadow-xs">
                     <div className="flex justify-between items-center mb-6">
                       <div>
-                        <h3 className="text-sm font-bold text-slate-900">Revenue Trend Chart</h3>
-                        <p className="text-[11px] text-slate-400 mt-0.5">Dual-chart analyzing sales of the last 7 days.</p>
+                        <h3 className="text-sm font-bold text-slate-900">{t('dashboard_revenue_trend_chart')}</h3>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{t('dashboard_revenue_trend_subtitle')}</p>
                       </div>
                       <span className="p-2 bg-slate-50 text-indigo-600 rounded-xl"><TrendingUp size={16} /></span>
                     </div>
                     <div className="h-72">
                       {salesChartData.length === 0 ? (
                         <div className="h-full flex items-center justify-center text-xs text-slate-400">
-                          No transaction data available to render chart
+                          {t('dashboard_no_transaction_data')}
                         </div>
                       ) : (
                         <ResponsiveContainer width="100%" height="100%">
@@ -457,13 +490,13 @@ const Dashboard = ({ token }) => {
                   {/* Order status breakdown */}
                   <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xs flex flex-col justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-slate-900 mb-1">Order Status Distribution</h3>
-                      <p className="text-[11px] text-slate-400">Pipeline analysis of order fulfillment stages.</p>
+                      <h3 className="text-sm font-bold text-slate-900 mb-1">{t('dashboard_order_status_distribution')}</h3>
+                      <p className="text-[11px] text-slate-400">{t('dashboard_order_status_subtitle')}</p>
                     </div>
                     <div className="h-52 my-3">
                       {orders.length === 0 ? (
                         <div className="h-full flex items-center justify-center text-xs text-slate-400">
-                          No order status data available
+                          {t('dashboard_no_order_status_data')}
                         </div>
                       ) : (
                         <ResponsiveContainer width="100%" height="100%">
@@ -483,7 +516,7 @@ const Dashboard = ({ token }) => {
                         <div key={item.name} className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl">
                           <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS_STATUS[idx] }} />
                           <div className="min-w-0 flex-1">
-                            <p className="text-[10px] text-slate-400 uppercase font-bold">{item.name}</p>
+                            <p className="text-[10px] text-slate-400 uppercase font-bold">{getPieStatusLabel(item.name, t)}</p>
                             <p className="font-extrabold text-slate-800">{item.value} orders</p>
                           </div>
                         </div>
@@ -499,8 +532,8 @@ const Dashboard = ({ token }) => {
                   {/* Warnings panel */}
                   <div className="lg:col-span-1 bg-white p-6 rounded-3xl border border-slate-100 shadow-xs flex flex-col justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-slate-900 mb-1">Operational Alerts</h3>
-                      <p className="text-[11px] text-slate-400 mb-4">Critical warehouse restocking requirements.</p>
+                      <h3 className="text-sm font-bold text-slate-900 mb-1">{t('dashboard_operational_alerts')}</h3>
+                      <p className="text-[11px] text-slate-400 mb-4">{t('dashboard_operational_alerts_subtitle')}</p>
                     </div>
                     <div className="space-y-3">
                       {stockAlerts.slice(0, 4).map(alert => (
@@ -512,7 +545,7 @@ const Dashboard = ({ token }) => {
                             <p className="text-xs font-bold text-slate-800 truncate" title={alert.name}>{alert.name}</p>
                             <span className={`inline-flex items-center gap-1.5 text-[10px] font-extrabold mt-0.5 ${alert.isOut ? 'text-rose-600' : 'text-orange-600'}`}>
                               <span className={`w-1.5 h-1.5 rounded-full ${alert.isOut ? 'bg-rose-500 animate-ping' : 'bg-orange-500'}`}></span>
-                              {alert.isOut ? 'OUT OF STOCK' : `LOW STOCK: ${alert.remaining} LEFT`} &bull; SIZE {alert.size}
+                              {alert.isOut ? t('dashboard_out_of_stock') : t('dashboard_low_stock', { remaining: alert.remaining })} &bull; SIZE {alert.size}
                             </span>
                           </div>
                         </div>
@@ -520,12 +553,12 @@ const Dashboard = ({ token }) => {
                       {stockAlerts.length === 0 && (
                         <div className="p-10 text-center text-xs text-slate-400">
                           <CheckCircle size={24} className="text-emerald-500 mx-auto mb-2" />
-                          All products are currently fully stocked.
+                          {t('dashboard_all_stocked')}
                         </div>
                       )}
                     </div>
                     <div className="pt-4 border-t border-slate-100 mt-4 text-center">
-                      <span className="text-[11px] text-slate-400">Operational Health: <strong className="text-emerald-600">Excellent</strong></span>
+                      <span className="text-[11px] text-slate-400">{t('dashboard_operational_health')}</span>
                     </div>
                   </div>
 
@@ -533,12 +566,12 @@ const Dashboard = ({ token }) => {
                   <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-100 shadow-xs">
                     <div className="flex justify-between items-center mb-4">
                       <div>
-                        <h3 className="text-sm font-bold text-slate-900">Recent Activities</h3>
-                        <p className="text-[11px] text-slate-400 mt-0.5">Real-time log of customer checkouts.</p>
+                        <h3 className="text-sm font-bold text-slate-900">{t('dashboard_recent_activities')}</h3>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{t('dashboard_recent_activities_subtitle')}</p>
                       </div>
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Live Feed
+                        {t('dashboard_live_feed')}
                       </span>
                     </div>
                     <div className="space-y-4 max-h-[220px] overflow-y-auto pr-2 scrollbar-none">
@@ -562,7 +595,7 @@ const Dashboard = ({ token }) => {
                       ))}
                       {orders.length === 0 && (
                         <div className="py-12 text-center text-slate-400 text-xs">
-                          No transaction activity found.
+                          {t('dashboard_no_transaction_activity')}
                         </div>
                       )}
                     </div>
@@ -580,11 +613,11 @@ const Dashboard = ({ token }) => {
                   
                   {/* Revenue by SubCategory */}
                   <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-100 shadow-xs">
-                    <h3 className="text-sm font-bold text-slate-900 mb-6">Revenue by Product Line (SubCategory)</h3>
+                    <h3 className="text-sm font-bold text-slate-900 mb-6">{t('dashboard_revenue_by_product_line')}</h3>
                     <div className="h-64">
                       {productInsights.subCategoryData.length === 0 ? (
                         <div className="h-full flex items-center justify-center text-xs text-slate-400">
-                          No SubCategory revenue data available
+                          {t('dashboard_no_subcategory_data')}
                         </div>
                       ) : (
                         <ResponsiveContainer width="100%" height="100%">
@@ -603,13 +636,13 @@ const Dashboard = ({ token }) => {
                   {/* Popular Sizes representation */}
                   <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xs flex flex-col justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-slate-900">Popular Sizes</h3>
-                      <p className="text-[11px] text-slate-400">Analysis based on actual order fulfillment quantity.</p>
+                      <h3 className="text-sm font-bold text-slate-900">{t('dashboard_popular_sizes')}</h3>
+                      <p className="text-[11px] text-slate-400">{t('dashboard_popular_sizes_subtitle')}</p>
                     </div>
                     <div className="h-44 mt-4">
                       {productInsights.sizeData.length === 0 ? (
                         <div className="h-full flex items-center justify-center text-xs text-slate-400">
-                          No size data from orders available
+                          {t('dashboard_no_size_data')}
                         </div>
                       ) : (
                         <ResponsiveContainer width="100%" height="100%">
@@ -629,9 +662,9 @@ const Dashboard = ({ token }) => {
                         <div key={item.name} className="flex justify-between items-center text-xs">
                           <span className="font-semibold text-slate-600 flex items-center gap-1.5">
                             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: ["#818cf8", "#f472b6", "#34d399", "#fbbf24"][idx % 4] }} />
-                            Size {item.name}
+                            {t('dashboard_size_label', { name: item.name })}
                           </span>
-                          <span className="font-extrabold text-slate-800">{item.value} items sold</span>
+                          <span className="font-extrabold text-slate-800">{t('dashboard_items_sold', { count: item.value })}</span>
                         </div>
                       ))}
                     </div>
@@ -641,7 +674,7 @@ const Dashboard = ({ token }) => {
 
                 {/* Popular Inventory Catalog Grid */}
                 <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xs">
-                  <h3 className="text-sm font-bold text-slate-900 mb-6">Featured Products</h3>
+                  <h3 className="text-sm font-bold text-slate-900 mb-6">{t('dashboard_featured_products')}</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     {products.slice(0, 4).map((p) => {
                       const hasStock = p.stock ? Object.values(p.stock).reduce((acc, curr) => acc + (curr.remaining || 0), 0) > 0 : false;
@@ -652,11 +685,11 @@ const Dashboard = ({ token }) => {
                             <img src={p.image?.[0] || 'https://placehold.co/150'} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="" />
                             {p.bestseller && (
                               <span className="absolute top-2 left-2 px-2 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-black rounded-full border border-amber-200 tracking-wider">
-                                BESTSELLER
+                                {t('dashboard_bestseller')}
                               </span>
                             )}
                             <span className={`absolute bottom-2 right-2 px-2 py-0.5 rounded-full text-[9px] font-black border ${hasStock ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'}`}>
-                              {hasStock ? 'IN STOCK' : 'OUT OF STOCK'}
+                              {hasStock ? t('dashboard_in_stock') : t('dashboard_out_of_stock_badge')}
                             </span>
                           </div>
                           <div className="p-4 space-y-1.5">
@@ -669,7 +702,7 @@ const Dashboard = ({ token }) => {
                     })}
                     {products.length === 0 && (
                       <div className="col-span-4 py-12 text-center text-slate-400 text-xs">
-                        No products found in the database.
+                        {t('dashboard_no_products_found')}
                       </div>
                     )}
                   </div>
@@ -686,7 +719,7 @@ const Dashboard = ({ token }) => {
                   <div className="relative flex-1 max-w-md">
                     <input 
                       type="text" 
-                      placeholder="Search by customer name, order ID..."
+                      placeholder={t('dashboard_search_orders_placeholder')}
                       value={orderSearch}
                       onChange={(e) => setOrderSearch(e.target.value)}
                       className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 bg-slate-50/50"
@@ -702,11 +735,11 @@ const Dashboard = ({ token }) => {
                       onChange={(e) => setOrderStatusFilter(e.target.value)}
                       className="px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white text-slate-600 font-semibold focus:outline-none cursor-pointer"
                     >
-                      <option value="All">All Statuses</option>
-                      <option value="Order Placed">Order Placed</option>
-                      <option value="Packing">Packing</option>
-                      <option value="Shipped">Shipped</option>
-                      <option value="Delivered">Delivered</option>
+                      <option value="All">{t('dashboard_all_statuses')}</option>
+                      <option value="Order Placed">{t('orders_status_order_placed')}</option>
+                      <option value="Packing">{t('orders_status_packing')}</option>
+                      <option value="Shipped">{t('orders_status_shipped')}</option>
+                      <option value="Delivered">{t('orders_status_delivered')}</option>
                     </select>
 
                     <select
@@ -714,10 +747,10 @@ const Dashboard = ({ token }) => {
                       onChange={(e) => setOrderSortBy(e.target.value)}
                       className="px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white text-slate-600 font-semibold focus:outline-none cursor-pointer"
                     >
-                      <option value="date-desc">Newest First</option>
-                      <option value="date-asc">Oldest First</option>
-                      <option value="amount-desc">Highest Amount</option>
-                      <option value="amount-asc">Lowest Amount</option>
+                      <option value="date-desc">{t('dashboard_newest_first')}</option>
+                      <option value="date-asc">{t('dashboard_oldest_first')}</option>
+                      <option value="amount-desc">{t('dashboard_highest_amount')}</option>
+                      <option value="amount-asc">{t('dashboard_lowest_amount')}</option>
                     </select>
 
                   </div>
@@ -729,13 +762,13 @@ const Dashboard = ({ token }) => {
                     <table className="w-full text-left border-separate border-spacing-y-2.5">
                       <thead>
                         <tr className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                          <th className="py-3 px-4 w-32">Order ID & Date</th>
-                          <th className="py-3 px-3 w-48">Customer</th>
-                          <th className="py-3 px-3 w-28 text-center">Payment</th>
-                          <th className="py-3 px-3 w-28 text-center">Method</th>
-                          <th className="py-3 px-3 w-32 text-right">Total Amount</th>
-                          <th className="py-3 px-3 w-40 text-center">Delivery Status</th>
-                          <th className="py-3 px-4 text-right w-16">Details</th>
+                          <th className="py-3 px-4 w-32">{t('dashboard_order_id_date')}</th>
+                          <th className="py-3 px-3 w-48">{t('dashboard_customer')}</th>
+                          <th className="py-3 px-3 w-28 text-center">{t('dashboard_payment')}</th>
+                          <th className="py-3 px-3 w-28 text-center">{t('dashboard_method')}</th>
+                          <th className="py-3 px-3 w-32 text-right">{t('dashboard_total_amount')}</th>
+                          <th className="py-3 px-3 w-40 text-center">{t('dashboard_delivery_status')}</th>
+                          <th className="py-3 px-4 text-right w-16">{t('dashboard_details')}</th>
                         </tr>
                       </thead>
                       <tbody className="text-xs">
@@ -758,7 +791,7 @@ const Dashboard = ({ token }) => {
                               <td className="py-3 px-3 border-y border-slate-100/70 text-center">
                                 <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${o.payment ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'}`}>
                                   <span className={`w-1 h-1 rounded-full ${o.payment ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`}></span>
-                                  {o.payment ? 'Completed' : 'Pending'}
+                                  {o.payment ? t('orders_completed') : t('orders_pending_payment')}
                                 </span>
                               </td>
 
@@ -774,7 +807,7 @@ const Dashboard = ({ token }) => {
 
                               <td className="py-3 px-3 border-y border-slate-100/70 text-center">
                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border ${getStatusStyle(o.status)}`}>
-                                  {o.status}
+                                  {getOrderStatusLabel(o.status, t)}
                                 </span>
                               </td>
 
@@ -794,7 +827,7 @@ const Dashboard = ({ token }) => {
                                 <td colSpan={7} className="px-6 py-4 bg-slate-50/50 border-x border-b border-slate-100 rounded-b-2xl">
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Shipping Address</p>
+                                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t('dashboard_shipping_address')}</p>
                                       <div className="space-y-1 text-xs">
                                         <p className="font-bold text-slate-800">{o.address?.street}</p>
                                         <p className="text-slate-500">{o.address?.city}, {o.address?.state || ''} {o.address?.zipcode || ''}</p>
@@ -803,7 +836,7 @@ const Dashboard = ({ token }) => {
                                       </div>
                                     </div>
                                     <div>
-                                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Products in Order ({o.items?.length || 0})</p>
+                                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t('dashboard_products_in_order', { count: o.items?.length || 0 })}</p>
                                       <div className="space-y-2.5">
                                         {o.items?.map((item, idx) => (
                                           <div key={idx} className="flex justify-between items-center bg-white p-2 rounded-xl border border-slate-100">
@@ -831,7 +864,7 @@ const Dashboard = ({ token }) => {
                           <tr>
                             <td colSpan={7} className="py-12 text-center text-slate-400">
                               <ShoppingBag size={32} className="mx-auto mb-2 text-slate-300" />
-                              No orders match the selected filters.
+                              {t('dashboard_no_orders_match_filters')}
                             </td>
                           </tr>
                         )}
@@ -884,11 +917,11 @@ const Dashboard = ({ token }) => {
                   
                   {/* Account status allocation segment */}
                   <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xs">
-                    <h3 className="text-sm font-bold text-slate-900 mb-6">Member Status Distribution</h3>
+                    <h3 className="text-sm font-bold text-slate-900 mb-6">{t('dashboard_member_status_distribution')}</h3>
                     <div className="h-64">
                       {users.length === 0 ? (
                         <div className="h-full flex items-center justify-center text-xs text-slate-400">
-                          No members to analyze
+                          {t('dashboard_no_members_to_analyze')}
                         </div>
                       ) : (
                         <ResponsiveContainer width="100%" height="100%">
@@ -906,14 +939,14 @@ const Dashboard = ({ token }) => {
                       )}
                     </div>
                     <div className="flex justify-center gap-4 text-xs font-semibold">
-                      <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>Active ({stats.activeCust})</span>
-                      <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>Suspended ({stats.totalCust - stats.activeCust})</span>
+                      <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>{t('dashboard_active')} ({stats.activeCust})</span>
+                      <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>{t('dashboard_suspended')} ({stats.totalCust - stats.activeCust})</span>
                     </div>
                   </div>
 
                   {/* System registered users list */}
                   <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-100 shadow-xs">
-                    <h3 className="text-sm font-bold text-slate-900 mb-4">Recently Registered Members</h3>
+                    <h3 className="text-sm font-bold text-slate-900 mb-4">{t('dashboard_recently_registered_members')}</h3>
                     <div className="divide-y divide-slate-100 max-h-[280px] overflow-y-auto scrollbar-none pr-1">
                       {users.map(u => (
                         <div key={u._id} className="py-3 flex justify-between items-center first:pt-0 last:pb-0">
@@ -927,7 +960,7 @@ const Dashboard = ({ token }) => {
                             </div>
                           </div>
                           <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${u.status === 'Active' ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-rose-50 border-rose-100 text-rose-700'}`}>
-                            {u.status}
+                            {u.status === 'Active' ? t('dashboard_active') : t('dashboard_suspended')}
                           </span>
                         </div>
                       ))}

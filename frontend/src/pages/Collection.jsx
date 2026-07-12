@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ShopContext } from '../context/ShopContext'
 import { assets } from '../assets/assets'
 import Title from '../components/Title'
@@ -6,6 +7,7 @@ import ProductItem from '../components/ProductItem'
 
 const Collection = () => {
   const { products, search, showSearch } = useContext(ShopContext);
+  const { t } = useTranslation();
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
   
@@ -24,9 +26,9 @@ const Collection = () => {
   const sortRef = useRef(null);
 
   const sortOptions = [
-    { value: 'relavent', label: 'Sort by: Relevant' },
-    { value: 'low-high', label: 'Sort by: Low to High' },
-    { value: 'high-low', label: 'Sort by: High to Low' },
+    { value: 'relavent', label: t('filter_sort_relevant') },
+    { value: 'low-high', label: t('filter_sort_low_high') },
+    { value: 'high-low', label: t('filter_sort_high_low') },
   ];
 
   useEffect(() => {
@@ -134,7 +136,7 @@ const Collection = () => {
       {/* --- CỘT TRÁI: DANH SÁCH BỘ LỌC --- */}
       <div className='min-w-60'>
         <p onClick={()=>setShowFilter(!showFilter)} className='my-2 text-xl flex items-center cursor-pointer gap-2 font-medium' >
-          FILTERS
+          {t('filters_title')}
           <img className={`h-3 sm:hidden transition-transform duration-300 ${showFilter ? 'rotate-90' : ''}`} src={assets.dropdown_icon} alt="" />
         </p>
         
@@ -142,7 +144,7 @@ const Collection = () => {
           
           {/* 1. Category Filter */}
           <div className='border border-gray-150 rounded-xl px-5 py-4 bg-white shadow-sm hover:shadow-md transition-shadow'>
-            <p className='mb-3 text-xs font-bold text-gray-800 tracking-wider uppercase'>Category</p>
+            <p className='mb-3 text-xs font-bold text-gray-800 tracking-wider uppercase'>{t('filter_category')}</p>
             <div className='flex flex-col gap-3 text-sm text-gray-600'>
               {['Men', 'Women', 'Unisex'].map((cat) => (
                 <label key={cat} className='flex items-center gap-3 cursor-pointer hover:text-gray-900 transition-colors'>
@@ -155,7 +157,7 @@ const Collection = () => {
 
           {/* 2. SubCategory Filter */}
           <div className='border border-gray-150 rounded-xl px-5 py-4 bg-white shadow-sm hover:shadow-md transition-shadow'>
-            <p className='mb-3 text-xs font-bold text-gray-800 tracking-wider uppercase'>Type</p>
+            <p className='mb-3 text-xs font-bold text-gray-800 tracking-wider uppercase'>{t('filter_type')}</p>
             <div className='flex flex-col gap-3 text-sm text-gray-600'>
               {['Topwear', 'Bottomwear', 'Dress'].map((type) => (
                 <label key={type} className='flex items-center gap-3 cursor-pointer hover:text-gray-900 transition-colors'>
@@ -168,7 +170,7 @@ const Collection = () => {
 
           {/* 3. Seasons Filter */}
           <div className='border border-gray-150 rounded-xl px-5 py-4 bg-white shadow-sm hover:shadow-md transition-shadow'>
-            <p className='mb-3 text-xs font-bold text-gray-800 tracking-wider uppercase'>Seasons</p>
+            <p className='mb-3 text-xs font-bold text-gray-800 tracking-wider uppercase'>{t('filter_seasons')}</p>
             <div className='flex flex-col gap-3 text-sm text-gray-600'>
               {['Spring', 'Summer', 'Autumn', 'Winter'].map((season) => (
                 <label key={season} className='flex items-center gap-3 cursor-pointer hover:text-gray-900 transition-colors'>
@@ -181,7 +183,7 @@ const Collection = () => {
 
           {/* 4. Styles Filter */}
           <div className='border border-gray-150 rounded-xl px-5 py-4 bg-white shadow-sm hover:shadow-md transition-shadow'>
-            <p className='mb-3 text-xs font-bold text-gray-800 tracking-wider uppercase'>Styles</p>
+            <p className='mb-3 text-xs font-bold text-gray-800 tracking-wider uppercase'>{t('filter_styles')}</p>
             <div className='flex flex-col gap-3 text-sm text-gray-600'>
               {['Casual', 'Office', 'Sporty', 'Streetwear', 'Elegant'].map((style) => (
                 <label key={style} className='flex items-center gap-3 cursor-pointer hover:text-gray-900 transition-colors'>
@@ -195,7 +197,7 @@ const Collection = () => {
           {/* 5. Price Range Slider */}
           <div className='border border-gray-150 rounded-xl px-5 py-4 bg-white shadow-sm hover:shadow-md transition-shadow'>
             <div className='flex justify-between items-center mb-4'>
-              <p className='text-xs font-bold text-gray-800 tracking-wider uppercase'>Max Price</p>
+              <p className='text-xs font-bold text-gray-800 tracking-wider uppercase'>{t('filter_max_price')}</p>
               <p className='text-sm font-semibold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded'>
                 ${maxPrice}
               </p>
@@ -225,7 +227,7 @@ const Collection = () => {
       {/* --- CỘT PHẢI: HIỂN THỊ SẢN PHẨM --- */}
       <div className='flex-1'>
         <div className='flex justify-between items-center text-base sm:text-2xl mb-4 relative z-20'>
-          <Title text1={'ALL'} text2={'COLLECTIONS'} />
+<Title text1={t('all')} text2={t('collections')} />
           
           {/* CUSTOM SORT DROPDOWN THAY THẾ CHO <select> */}
           <div ref={sortRef} className='relative text-sm'>
@@ -275,8 +277,8 @@ const Collection = () => {
                 <svg className="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                 </svg>
-                <p className="text-lg font-medium text-gray-700">Không tìm thấy sản phẩm</p>
-                <p className="text-sm mt-1">Vui lòng điều chỉnh lại bộ lọc giá hoặc danh mục.</p>
+                <p className="text-lg font-medium text-gray-700">{t('filter_no_products_found')}</p>
+                <p className="text-sm mt-1">{t('filter_no_products_found_description')}</p>
               </div>
             )
           }

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { ShopContext } from '../context/ShopContext';
 import { useContext, useState, useEffect } from 'react';
 import Title from '../components/Title';
@@ -9,6 +10,7 @@ import { toast } from 'react-toastify';
 const Cart = () => {
 
   const {products, currency, cartItems, updateQuantity, navigate} = useContext(ShopContext);
+  const { t } = useTranslation();
 
   const [cartData, setCartData] = useState([]);
 
@@ -34,7 +36,7 @@ const Cart = () => {
   return (
     <div className='border-t pt-14 bg-white'>
       <div className='text-2xl mb-6'>
-        <Title text1={'YOUR'} text2={'CART'} />
+        <Title text1={t('your')} text2={t('cart')} />
       </div>
 
       {/* Thêm space-y-4 để tạo khoảng cách đều giữa các thẻ sản phẩm */}
@@ -67,7 +69,7 @@ const Cart = () => {
                   min={1} 
                   max={productData.stock?.[item.size]?.remaining || 0} 
                   defaultValue={item.quantity}
-                  placeholder="1"
+                  placeholder={t('cart_quantity_placeholder')}
                   onChange={(e) => {
                     const val = e.target.value;
                     
@@ -79,7 +81,7 @@ const Cart = () => {
                     
                     // If input exceeds stock, clamp UI to max and persist that quantity.
                     if (num > availableStock) {
-                      toast.error(`Chỉ còn ${availableStock} sản phẩm trong kho`);
+                      toast.error(t('cart_only_x_items_left_in_stock', { count: availableStock }));
                       e.target.value = availableStock; 
                       updateQuantity(item._id, item.size, availableStock);
                     } else {
@@ -110,7 +112,7 @@ const Cart = () => {
           <div className='w-full text-end mt-6'>
             {/* Bo tròn hoàn toàn nút bấm (rounded-full), thêm hiệu ứng nảy khi click (active:scale-95) */}
             <button onClick={()=>navigate('/place-order')} className='bg-black text-white font-medium text-sm px-8 py-3.5 rounded-full hover:bg-gray-800 hover:shadow-lg active:scale-95 transition-all duration-300 w-full sm:w-auto'>
-              PROCEED TO CHECKOUT
+              {t('cart_proceed_to_checkout')}
             </button>
           </div>
         </div>

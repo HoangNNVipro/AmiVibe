@@ -4,8 +4,10 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { backendUrl } from '../App';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 const Add = ({ token }) => {
+  const { t } = useTranslation();
 
   // Sử dụng một mảng lưu trữ danh sách các file ảnh tải lên động
   const [images, setImages] = useState([]);
@@ -84,7 +86,7 @@ const Add = ({ token }) => {
     const updatedImages = images.filter((_, index) => index !== indexToRemove);
     setImages(updatedImages);
     if (updatedImages.length === 0) {
-      setErrors({ images: "Vui lòng tải lên ít nhất 1 hình ảnh sản phẩm!" });
+      setErrors({ images: t('add_validation_image_required') });
     }
   };
 
@@ -123,56 +125,56 @@ const Add = ({ token }) => {
 
     // --- KIỂM TRA VALIDATION THEO THỨ TỰ TỪ TRÊN XUỐNG DƯỚI (CHỈ LẤY LỖI ĐẦU TIÊN) ---
     if (images.length === 0) {
-      const errorMsg = "Vui lòng tải lên ít nhất 1 hình ảnh sản phẩm!";
+      const errorMsg = t('add_validation_image_required');
       setErrors({ images: errorMsg });
       toast.error(errorMsg);
       scrollToSection("section-images");
       return;
     }
     if (sizes.length === 0) {
-      const errorMsg = "Vui lòng chọn ít nhất 1 kích thước!";
+      const errorMsg = t('add_validation_size_required');
       setErrors({ sizes: errorMsg });
       toast.error(errorMsg);
       scrollToSection("section-sizes");
       return;
     }
     if (seasons.length === 0) {
-      const errorMsg = "Vui lòng chọn ít nhất 1 mùa thích hợp!";
+      const errorMsg = t('add_validation_season_required');
       setErrors({ seasons: errorMsg });
       toast.error(errorMsg);
       scrollToSection("section-seasons");
       return;
     }
     if (styles.length === 0) {
-      const errorMsg = "Vui lòng chọn ít nhất 1 phong cách!";
+      const errorMsg = t('add_validation_style_required');
       setErrors({ styles: errorMsg });
       toast.error(errorMsg);
       scrollToSection("section-styles");
       return;
     }
     if (colors.length === 0) {
-      const errorMsg = "Vui lòng chọn ít nhất 1 màu sắc!";
+      const errorMsg = t('add_validation_color_required');
       setErrors({ colors: errorMsg });
       toast.error(errorMsg);
       scrollToSection("section-colors");
       return;
     }
     if (materials.length === 0) {
-      const errorMsg = "Vui lòng chọn ít nhất 1 chất liệu!";
+      const errorMsg = t('add_validation_material_required');
       setErrors({ materials: errorMsg });
       toast.error(errorMsg);
       scrollToSection("section-materials");
       return;
     }
     if (!fit) {
-      const errorMsg = "Vui lòng chọn phom dáng sản phẩm!";
+      const errorMsg = t('add_validation_fit_required');
       setErrors({ fit: errorMsg });
       toast.error(errorMsg);
       scrollToSection("section-fit");
       return;
     }
     if (occasions.length === 0) {
-      const errorMsg = "Vui lòng chọn ít nhất 1 dịp sử dụng!";
+      const errorMsg = t('add_validation_occasion_required');
       setErrors({ occasions: errorMsg });
       toast.error(errorMsg);
       scrollToSection("section-occasions");
@@ -255,15 +257,15 @@ const Add = ({ token }) => {
       
       {/* Tiêu đề trang trí */}
       <div className='border-b border-slate-100 pb-4 w-full'>
-        <h2 className='text-xl font-bold text-slate-800'>Add New Product</h2>
-        <p className='text-xs text-slate-400 mt-1'>Fill in all the product details below to add a new inventory item.</p>
+        <h2 className='text-xl font-bold text-slate-800'>{t('add_new_product_title')}</h2>
+        <p className='text-xs text-slate-400 mt-1'>{t('add_new_product_subtitle')}</p>
       </div>
 
       {/* 1. Dynamic Upload Image Section */}
       <div id="section-images" className={`w-full p-4 rounded-xl border transition-all duration-300 ${errors.images ? 'bg-red-50/40 border-red-200' : 'border-transparent'}`}>
         <p className='font-medium text-sm text-slate-800 mb-1 flex items-center gap-1.5'>
-          Upload Images <span className="text-red-500">*</span> 
-          <span className='text-xs text-slate-400 font-normal'>(At least 1 image, unlimited uploads)</span>
+          {t('add_upload_images')} <span className="text-red-500">*</span> 
+          <span className='text-xs text-slate-400 font-normal'>({t('add_upload_images_hint')})</span>
         </p>
         {errors.images && <p className='text-xs text-red-500 font-medium mb-3'>{errors.images}</p>}
         
@@ -289,7 +291,7 @@ const Add = ({ token }) => {
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-8 h-8 transition-colors ${errors.images ? 'text-red-400 group-hover:text-red-600' : 'text-slate-400 group-hover:text-slate-600'}`}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
-              <span className={`text-[10px] font-semibold tracking-wider uppercase mt-1 ${errors.images ? 'text-red-400 group-hover:text-red-600' : 'text-slate-400 group-hover:text-slate-600'}`}>Add Image</span>
+              <span className={`text-[10px] font-semibold tracking-wider uppercase mt-1 ${errors.images ? 'text-red-400 group-hover:text-red-600' : 'text-slate-400 group-hover:text-slate-600'}`}>{t('add_add_image')}</span>
             </div>
             <input 
               onChange={handleImageChange} 
@@ -306,14 +308,14 @@ const Add = ({ token }) => {
       {/* 2. Product Name */}
       <div className='w-full px-4'>
         <p className='font-medium text-sm text-slate-800 mb-2'>
-          Product Name <span className="text-red-500">*</span>
+          {t('add_product_name')} <span className="text-red-500">*</span>
         </p>
         <input 
           onChange={(e) => setName(e.target.value)} 
           value={name} 
           className='w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-800/20 focus:border-slate-800 transition-all text-sm' 
           type="text" 
-          placeholder='Type here' 
+          placeholder={t('add_placeholder_type_here')} 
           required
         />
       </div>
@@ -321,13 +323,13 @@ const Add = ({ token }) => {
       {/* 3. Product Description */}
       <div className='w-full px-4'>
         <p className='font-medium text-sm text-slate-800 mb-2'>
-          Product Description <span className="text-red-500">*</span>
+          {t('add_product_description')} <span className="text-red-500">*</span>
         </p>
         <textarea 
           onChange={(e) => setDescription(e.target.value)} 
           value={description} 
           className='w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-800/20 focus:border-slate-800 transition-all text-sm min-h-[100px]' 
-          placeholder='Write content here' 
+          placeholder={t('add_placeholder_write_content')} 
           required
         />
       </div>
@@ -337,7 +339,7 @@ const Add = ({ token }) => {
         {/* Custom Category Dropdown */}
         <div ref={categoryRef} className="relative">
           <p className='font-medium text-sm text-slate-800 mb-2'>
-            Product category <span className="text-red-500">*</span>
+            {t('add_product_category')} <span className="text-red-500">*</span>
           </p>
           <div 
             onClick={() => setIsCategoryOpen(!isCategoryOpen)}
@@ -380,7 +382,7 @@ const Add = ({ token }) => {
         {/* Custom Sub Category Dropdown */}
         <div ref={subCategoryRef} className="relative">
           <p className='font-medium text-sm text-slate-800 mb-2'>
-            Sub category <span className="text-red-500">*</span>
+            {t('add_sub_category')} <span className="text-red-500">*</span>
           </p>
           <div 
             onClick={() => setIsSubCategoryOpen(!isSubCategoryOpen)}
@@ -422,14 +424,14 @@ const Add = ({ token }) => {
 
         <div>
           <p className='font-medium text-sm text-slate-800 mb-2'>
-            Product Price ($) <span className="text-red-500">*</span>
+            {t('add_product_price')} <span className="text-red-500">*</span>
           </p>
           <input 
             onChange={(e) => setPrice(e.target.value)} 
             value={price} 
             className='w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-800/20 focus:border-slate-800 transition-all text-sm shadow-sm' 
             type="number" 
-            placeholder='25' 
+            placeholder={t('add_placeholder_price')} 
             min="0"
             required
           />
@@ -439,7 +441,7 @@ const Add = ({ token }) => {
       {/* 5. Product Sizes (Chọn nhiều) */}
       <div id="section-sizes" className={`w-full p-4 rounded-xl border transition-all duration-300 ${errors.sizes ? 'bg-red-50/40 border-red-200' : 'border-transparent'}`}>
         <p className='font-medium text-sm text-slate-800 mb-1'>
-          Product Sizes <span className='text-xs text-slate-400 font-normal'>(Multiple select)</span> <span className="text-red-500">*</span>
+          {t('add_product_sizes')} <span className='text-xs text-slate-400 font-normal'>{t('add_multiple_select')}</span> <span className="text-red-500">*</span>
         </p>
         {errors.sizes && <p className='text-xs text-red-500 font-medium mb-3'>{errors.sizes}</p>}
         
@@ -462,7 +464,7 @@ const Add = ({ token }) => {
           <div className='mt-4 space-y-2'>
             {sizes.map((size) => (
               <div key={size} className='flex items-center gap-4 mt-3 p-3 bg-slate-50 border border-slate-200 rounded-lg max-w-sm'>
-                <span className='font-semibold text-sm w-16'>{`Size ${size}`}</span>
+                <span className='font-semibold text-sm w-16'>{t('dashboard_size_label', { name: size })}</span>
                 <input
                   type="number"
                   min="0"
@@ -481,7 +483,7 @@ const Add = ({ token }) => {
       {/* 6. Seasons (Mùa - Chọn nhiều) */}
       <div id="section-seasons" className={`w-full p-4 rounded-xl border border-t border-slate-150/80 transition-all duration-300 ${errors.seasons ? 'bg-red-50/40 border-red-200' : 'border-transparent'}`}>
         <p className='font-medium text-sm text-slate-800 mb-1'>
-          Seasons <span className='text-xs text-slate-400 font-normal'>(Multiple select)</span> <span className="text-red-500">*</span>
+          {t('add_seasons')} <span className='text-xs text-slate-400 font-normal'>{t('add_multiple_select')}</span> <span className="text-red-500">*</span>
         </p>
         {errors.seasons && <p className='text-xs text-red-500 font-medium mb-3'>{errors.seasons}</p>}
         
@@ -505,7 +507,7 @@ const Add = ({ token }) => {
       {/* 7. Styles (Phong cách - Chọn nhiều) */}
       <div id="section-styles" className={`w-full p-4 rounded-xl border transition-all duration-300 ${errors.styles ? 'bg-red-50/40 border-red-200' : 'border-transparent'}`}>
         <p className='font-medium text-sm text-slate-800 mb-1'>
-          Styles <span className='text-xs text-slate-400 font-normal'>(Multiple select)</span> <span className="text-red-500">*</span>
+          {t('add_styles')} <span className='text-xs text-slate-400 font-normal'>{t('add_multiple_select')}</span> <span className="text-red-500">*</span>
         </p>
         {errors.styles && <p className='text-xs text-red-500 font-medium mb-3'>{errors.styles}</p>}
         
@@ -529,7 +531,7 @@ const Add = ({ token }) => {
       {/* 8. Colors (Màu sắc - Chọn nhiều) */}
       <div id="section-colors" className={`w-full p-4 rounded-xl border transition-all duration-300 ${errors.colors ? 'bg-red-50/40 border-red-200' : 'border-transparent'}`}>
         <p className='font-medium text-sm text-slate-800 mb-1'>
-          Colors <span className='text-xs text-slate-400 font-normal'>(Multiple select)</span> <span className="text-red-500">*</span>
+          {t('add_colors')} <span className='text-xs text-slate-400 font-normal'>{t('add_multiple_select')}</span> <span className="text-red-500">*</span>
         </p>
         {errors.colors && <p className='text-xs text-red-500 font-medium mb-3'>{errors.colors}</p>}
         
@@ -561,7 +563,7 @@ const Add = ({ token }) => {
       {/* 9. Materials (Chất liệu - Chọn nhiều) */}
       <div id="section-materials" className={`w-full p-4 rounded-xl border transition-all duration-300 ${errors.materials ? 'bg-red-50/40 border-red-200' : 'border-transparent'}`}>
         <p className='font-medium text-sm text-slate-800 mb-1'>
-          Materials <span className='text-xs text-slate-400 font-normal'>(Multiple select)</span> <span className="text-red-500">*</span>
+          {t('add_materials')} <span className='text-xs text-slate-400 font-normal'>{t('add_multiple_select')}</span> <span className="text-red-500">*</span>
         </p>
         {errors.materials && <p className='text-xs text-red-500 font-medium mb-3'>{errors.materials}</p>}
         
@@ -588,7 +590,7 @@ const Add = ({ token }) => {
         {/* Fit Section - Single Select */}
         <div id="section-fit" className={`p-4 rounded-xl border transition-all duration-300 ${errors.fit ? 'bg-red-50/40 border-red-200' : 'border-transparent'}`}>
           <p className='font-medium text-sm text-slate-800 mb-1'>
-            Fit Style <span className='text-xs text-slate-400 font-normal'>(Select one)</span> <span className="text-red-500">*</span>
+            {t('add_fit_style')} <span className='text-xs text-slate-400 font-normal'>{t('add_select_one')}</span> <span className="text-red-500">*</span>
           </p>
           {errors.fit && <p className='text-xs text-red-500 font-medium mb-3'>{errors.fit}</p>}
           
@@ -627,7 +629,7 @@ const Add = ({ token }) => {
         {/* Occasions Section - Multiple Select */}
         <div id="section-occasions" className={`p-4 rounded-xl border transition-all duration-300 ${errors.occasions ? 'bg-red-50/40 border-red-200' : 'border-transparent'}`}>
           <p className='font-medium text-sm text-slate-800 mb-1'>
-            Occasions <span className='text-xs text-slate-400 font-normal'>(Multiple select)</span> <span className="text-red-500">*</span>
+            {t('add_occasions')} <span className='text-xs text-slate-400 font-normal'>{t('add_multiple_select')}</span> <span className="text-red-500">*</span>
           </p>
           {errors.occasions && <p className='text-xs text-red-500 font-medium mb-3'>{errors.occasions}</p>}
           
@@ -660,7 +662,7 @@ const Add = ({ token }) => {
           className='w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-800 cursor-pointer accent-slate-900'
         />
         <label className='text-sm font-medium text-slate-700 cursor-pointer select-none' htmlFor="bestseller">
-          Add to bestseller
+          {t('add_to_bestseller')}
         </label>
       </div>
 
@@ -670,7 +672,7 @@ const Add = ({ token }) => {
           type="submit" 
           className='w-full max-w-[200px] py-3.5 mt-2 bg-slate-950 hover:bg-slate-800 text-white font-semibold text-sm rounded-lg shadow-md hover:shadow-lg active:scale-95 transition-all duration-150 text-center tracking-wide'
         >
-          ADD PRODUCT
+          {t('add_submit')}
         </button>
       </div>
 

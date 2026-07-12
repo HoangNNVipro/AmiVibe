@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { io } from 'socket.io-client'
 import axios from 'axios'
 import { toast } from 'react-toastify'
@@ -27,6 +28,7 @@ const UserAvatar = ({ name, isAdminAvatar = false }) => {
 
 const ChatbotWidget = () => {
   const { token, backendUrl } = useContext(ShopContext)
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [inputValue, setInputValue] = useState('')
@@ -67,7 +69,7 @@ const ChatbotWidget = () => {
     const greetingMessage = {
       _id: `welcome-${Date.now()}`,
       from: 'admin',
-      text: 'Xin chào! Cảm ơn bạn đã ghé thăm cửa hàng. Bạn cần Admin hỗ trợ thông tin gì về sản phẩm hay dịch vụ không ạ? 👋',
+      text: t('chat_welcome_message'),
       createdAt: new Date().toISOString()
     };
     setMessages([greetingMessage]);
@@ -118,7 +120,7 @@ const ChatbotWidget = () => {
           setHistoryLoaded(true)
           return
         }
-        toast.error('Không tải được lịch sử chat.')
+        toast.error(t('chat_history_error'))
       })
       .finally(() => {
         if (isMounted) setLoadingHistory(false)
@@ -198,7 +200,7 @@ const ChatbotWidget = () => {
         setMessages(prev => [...prev, {
           _id: `mock-admin-${Date.now()}`,
           from: 'admin',
-          text: `[Giao diện thử nghiệm] Admin đã nhận: "${trimmed}".`,
+          text: t('chat_mock_admin_message', { message: trimmed }),
           createdAt: new Date().toISOString()
         }]);
       }, 1200);
@@ -253,10 +255,10 @@ const ChatbotWidget = () => {
                 <UserAvatar name="Admin" isAdminAvatar={true} />
                 <div>
                   <div className='text-sm font-bold tracking-wide flex items-center gap-1.5'>
-                    Support Center
+                    {t('chat_support_center')}
                     <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-ping"></span>
                   </div>
-                  <div className='text-xs text-blue-100 font-medium'>We're online • 24/7</div>
+                  <div className='text-xs text-blue-100 font-medium'>{t('chat_online_status')}</div>
                 </div>
               </div>
               <button
@@ -322,7 +324,7 @@ const ChatbotWidget = () => {
                   type='button'
                   onClick={() => setShowEmojiPicker(prev => !prev)}
                   className={`p-1 text-slate-400/60 hover:text-[#4364F7] transition duration-200 hover:scale-105 active:scale-95 ${showEmojiPicker ? 'text-[#4364F7]' : ''}`}
-                  title="Chèn biểu cảm"
+                  title={t('chat_insert_emoji')}
                 >
                   <svg 
                     viewBox="0 0 24 24" 
@@ -341,7 +343,7 @@ const ChatbotWidget = () => {
                   value={inputValue}
                   onChange={event => setInputValue(event.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder='Nhập tin nhắn...'
+                  placeholder={t('chat_input_placeholder')}
                   rows={1}
                   className='flex-1 max-h-[60px] resize-none bg-transparent text-sm outline-none py-1 text-slate-800 placeholder-slate-400 border-none focus:ring-0'
                 />
@@ -351,7 +353,7 @@ const ChatbotWidget = () => {
                   onClick={handleSendMessage}
                   className='inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-[#0052D4] via-[#4364F7] to-[#6FB1FC] text-white shadow-sm transition-all duration-200 hover:opacity-95 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:scale-100 disabled:shadow-none'
                   disabled={!inputValue.trim()}
-                  title="Gửi tin nhắn"
+                  title={t('chat_send_message')}
                 >
                   <svg 
                     viewBox="0 0 24 24" 
